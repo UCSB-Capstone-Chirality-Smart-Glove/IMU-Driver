@@ -1,0 +1,4 @@
+../Core/Src/init.c:19:8:SensorAPI_SPIx_Read1	2
+../Core/Src/init.c:34:8:SensorAPI_SPIx_Read2	2
+../Core/Src/init.c:185:8:SensorAPI_SPIx_Write1	2
+../Core/Src/init.c:200:8:SensorAPI_SPIx_Write2	2

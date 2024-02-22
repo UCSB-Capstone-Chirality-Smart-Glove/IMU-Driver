@@ -2,20 +2,15 @@
 #include <string.h>
 #include <math.h>
 #include <stdarg.h>
-#include "cmsis_os.h"
 #include "stm32wbxx_hal.h"
 #include "bmi323_task.h"
 #include "bmi323.h"
 #include "main.h"
 
-struct bmi3_dev dev, dev2;
 uint8_t bmi323_dev_addr;
 struct bmi3_sensor_data sensor_data = { 1 };
 
-uint8_t GTXBuffer[512], GRXBuffer[2048];
-
 extern UART_HandleTypeDef huart1;
-extern SPI_HandleTypeDef hspi1;
 
 /******************************************************************************/
 /*!               User interface functions                                    */
@@ -43,76 +38,6 @@ void PDEBUG(char *format, ...)
     vsnprintf(chBuffer, sizeof(chBuffer), format, ap);
     UART_Printf((uint8_t *)chBuffer,strlen(chBuffer));
     va_end(ap);
-}
-
-#define port1 GPIOA
-#define pin1 GPIO_PIN_4
-#define port2 GPIOA
-#define pin2 GPIO_PIN_5
-
-// Either create multiple devices or find a way to change port (first way easier / can change device purpose)
-int8_t SensorAPI_SPIx_Read1(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
-{
-    GTXBuffer[0] = reg_addr | 0x80;
-
-    HAL_GPIO_WritePin(port1, pin1, GPIO_PIN_RESET); // NSS low
-
-    //HAL_SPI_TransmitReceive(&hspi2, pTxData, pRxData, ReadNumbr+1, BUS_TIMEOUT); // timeout 1000msec;
-    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
-    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-
-    HAL_GPIO_WritePin(port1, pin1, GPIO_PIN_SET); // NSS high
-    memcpy(reg_data, GRXBuffer+1, length);
-
-    return 0;
-}
-
-int8_t SensorAPI_SPIx_Read2(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
-{
-    GTXBuffer[0] = reg_addr | 0x80;
-
-    HAL_GPIO_WritePin(port2, pin2, GPIO_PIN_RESET); // NSS low
-
-    //HAL_SPI_TransmitReceive(&hspi2, pTxData, pRxData, ReadNumbr+1, BUS_TIMEOUT); // timeout 1000msec;
-    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
-    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-
-    HAL_GPIO_WritePin(port2, pin2, GPIO_PIN_SET); // NSS high
-    memcpy(reg_data, GRXBuffer+1, length);
-
-    return 0;
-}
-
-int8_t SensorAPI_SPIx_Write1(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
-{
-    GTXBuffer[0] = reg_addr & 0x7F;
-    memcpy(&GTXBuffer[1], reg_data, length);
-
-    HAL_GPIO_WritePin(port1, pin1, GPIO_PIN_RESET); // NSS low
-
-    //HAL_SPI_TransmitReceive(&hspi2, pTxData, pRxData, WriteNumbr+1, BUS_TIMEOUT); // send register address + write data
-    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
-    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-
-    HAL_GPIO_WritePin(port1, pin1, GPIO_PIN_SET); // NSS high
-
-    return 0;
-}
-
-int8_t SensorAPI_SPIx_Write2(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
-{
-    GTXBuffer[0] = reg_addr & 0x7F;
-    memcpy(&GTXBuffer[1], reg_data, length);
-
-    HAL_GPIO_WritePin(port2, pin2, GPIO_PIN_RESET); // NSS low
-
-    //HAL_SPI_TransmitReceive(&hspi2, pTxData, pRxData, WriteNumbr+1, BUS_TIMEOUT); // send register address + write data
-    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
-    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-
-    HAL_GPIO_WritePin(port2, pin2, GPIO_PIN_SET); // NSS high
-
-    return 0;
 }
 
 /*!
@@ -325,15 +250,15 @@ int8_t Open_BMI323_ACC(struct bmi3_dev *dev)
 
 			/* Get the configuration settings for validation */
 			rslt = bmi323_get_sensor_config(&config, 1, dev);
-			if (rslt == BMI3_OK)
-			{
-				PDEBUG("Get ACC configuration successful\r\n");
-				PDEBUG("acc_mode = %d\r\n", config.cfg.acc.acc_mode);
-				PDEBUG("bwp = %d\r\n", config.cfg.acc.bwp);
-				PDEBUG("odr = %d\r\n", config.cfg.acc.odr);
-				PDEBUG("Range = %d\r\n", config.cfg.acc.range);
-				PDEBUG("avg_num = %d\r\n", config.cfg.acc.avg_num);
-			}
+//			if (rslt == BMI3_OK)
+//			{
+//				PDEBUG("Get ACC configuration successful\r\n");
+//				PDEBUG("acc_mode = %d\r\n", config.cfg.acc.acc_mode);
+//				PDEBUG("bwp = %d\r\n", config.cfg.acc.bwp);
+//				PDEBUG("odr = %d\r\n", config.cfg.acc.odr);
+//				PDEBUG("Range = %d\r\n", config.cfg.acc.range);
+//				PDEBUG("avg_num = %d\r\n", config.cfg.acc.avg_num);
+//			}
 		}
 	}
 
@@ -416,15 +341,15 @@ int8_t Open_BMI323_GYRO(struct bmi3_dev *dev)
 
 			/* Get the configuration settings for validation */
 			rslt = bmi323_get_sensor_config(&config, 1, dev);
-			if (rslt == BMI3_OK) 
-			{
-				PDEBUG("Get BMI323_GYRO Configuration successful\r\n");
-				PDEBUG("gyr_mode = %d\r\n", config.cfg.gyr.gyr_mode);
-				PDEBUG("ODR = %d\r\n", config.cfg.gyr.odr);
-				PDEBUG("Range = %d\r\n", config.cfg.gyr.range);
-				PDEBUG("bw = %d\r\n", config.cfg.gyr.bwp);
-				PDEBUG("avg_num = %d\r\n", config.cfg.gyr.avg_num);
-			}
+//			if (rslt == BMI3_OK)
+//			{
+//				PDEBUG("Get BMI323_GYRO Configuration successful\r\n");
+//				PDEBUG("gyr_mode = %d\r\n", config.cfg.gyr.gyr_mode);
+//				PDEBUG("ODR = %d\r\n", config.cfg.gyr.odr);
+//				PDEBUG("Range = %d\r\n", config.cfg.gyr.range);
+//				PDEBUG("bw = %d\r\n", config.cfg.gyr.bwp);
+//				PDEBUG("avg_num = %d\r\n", config.cfg.gyr.avg_num);
+//			}
 		}
 	}
 
@@ -480,12 +405,12 @@ int8_t Init_BMI323(struct bmi3_dev *dev)
 	uint8_t chipid;
 
 	rslt = bmi3_interface_init(dev, BMI3_SPI_INTF);
-	bmi3_error_codes_print_result("bmi3_interface_init",rslt);
-	osDelay(100);
+	//bmi3_error_codes_print_result("bmi3_interface_init",rslt);
+	HAL_Delay(100);
 
 	/* Initialize bmi323. */
 	rslt = bmi323_init(dev);
-	bmi3_error_codes_print_result("bmi323_init",rslt);
+	//bmi3_error_codes_print_result("bmi323_init",rslt);
 
 	if (rslt != BMI3_OK)
 	{
@@ -504,7 +429,6 @@ int8_t Init_BMI323(struct bmi3_dev *dev)
 		return rslt;
 	}
 
-	PDEBUG("Chip ID:0x%02x\r\n", chipid);
 	Open_BMI323_ACC(dev);
 	Open_BMI323_GYRO(dev);
 
@@ -514,14 +438,12 @@ int8_t Init_BMI323(struct bmi3_dev *dev)
 int16_t gyro_data[3];
 int16_t acc_data[3];
 
-uint8_t read_sensor(struct bmi3_dev dev)
+uint8_t read_sensor(struct bmi3_dev dev, float data[])
 {
 	uint8_t acc_regs[6];
 	uint8_t gyr_regs[6];
 	uint8_t rslt;
 
-	float gyr_x, gyr_y, gyr_z, acc_x, acc_y, acc_z;
-//	uint16_t temper;
 	rslt = bmi3_get_regs(BMI3_REG_GYR_DATA_X, &gyr_regs, 6, &dev);
 	if (rslt != BMI3_OK)
 	{
@@ -531,9 +453,6 @@ uint8_t read_sensor(struct bmi3_dev dev)
 	gyro_data[0] = (gyr_regs[0] | (uint16_t)gyr_regs[1] << 8);
 	gyro_data[1] = (gyr_regs[2] | (uint16_t)gyr_regs[3] << 8);
 	gyro_data[2] = (gyr_regs[4] | (uint16_t)gyr_regs[5] << 8);
-
-//	rslt = bmi3_get_regs(BMI3_REG_TEMP_DATA, &temp, 2, &dev);
-//	temper = (temp[0] | (uint16_t)temp[1] << 8);
 
 	rslt = bmi3_get_regs(BMI3_REG_ACC_DATA_X, &acc_regs, 6, &dev);
 	if (rslt != BMI3_OK)
@@ -545,57 +464,13 @@ uint8_t read_sensor(struct bmi3_dev dev)
 	acc_data[1] = (acc_regs[2] | (uint16_t)acc_regs[3] << 8);
 	acc_data[2] = (acc_regs[4] | (uint16_t)acc_regs[5] << 8);
 
-	gyr_x = lsb_to_dps(gyro_data[0], (float)2000, dev.resolution);
-	gyr_y = lsb_to_dps(gyro_data[1], (float)2000, dev.resolution);
-	gyr_z = lsb_to_dps(gyro_data[2], (float)2000, dev.resolution);
+	data[0] = lsb_to_dps(gyro_data[0], (float)2000, dev.resolution);
+	data[1] = lsb_to_dps(gyro_data[1], (float)2000, dev.resolution);
+	data[2] = lsb_to_dps(gyro_data[2], (float)2000, dev.resolution);
 
-	acc_x = lsb_to_mps2(acc_data[0], 2, dev.resolution);
-	acc_y = lsb_to_mps2(acc_data[1], 2, dev.resolution);
-	acc_z = lsb_to_mps2(acc_data[2], 2, dev.resolution);
-
-//	PDEBUG("Sensor Idx=%d Data=%X\r\n",index, tmp_regs[0]);
-//	PDEBUG("GYRO: X axis: %4d, Y axis: %4d, Z axis: %4d\r\n", gyro_data[0], gyro_data[1], gyro_data[2]);
-//	PDEBUG("ACC: X axis: %4d, Y axis: %4d, Z axis: %4d\r\n", acc_data[0], acc_data[1], acc_data[2]);
-	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", gyr_x, gyr_y, gyr_z);
-	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", acc_x, acc_y, acc_z);
-//	PDEBUG("Temperature = %d\r\n", (temper / 512 + 23));
+	data[3] = lsb_to_mps2(acc_data[0], 2, dev.resolution);
+	data[4] = lsb_to_mps2(acc_data[1], 2, dev.resolution);
+	data[5] = lsb_to_mps2(acc_data[2], 2, dev.resolution);
 
 	return 0;
 }
-
-
-
-void StartBMI323Task(void const * argument)
-{
-//	uint32_t notify_value;
-	int8_t rslt = BMI3_OK;
-	uint8_t flag;
-
-	dev.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read1;
-	dev.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write1;
-	Init_BMI323(&dev);
-	osDelay(100);
-	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
-	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
-	Init_BMI323(&dev2);
-
-//	BMI323_Print_ALLRegs(&dev);
-//	BMI323_Print_ALLRegs(&dev2);
-
-	for(;;)
-	{
-//		if(xTaskNotifyWait(0, 0, &notify_value, portMAX_DELAY))
-//		{
-			bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-			if((flag & 0x40) == 0) continue;
-			PDEBUG("1:\n");
-			read_sensor(dev);
-			bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-			if((flag & 0x40) == 0) continue;
-			PDEBUG("2:\n");
-			read_sensor(dev2);
-			osDelay(500);
-//		}
-	}
-}
-

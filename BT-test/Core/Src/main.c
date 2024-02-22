@@ -18,11 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bmi323_task.h"
+#include "init.h"
+//#include <time.h>
 
 /* USER CODE END Includes */
 
@@ -56,20 +57,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 PCD_HandleTypeDef hpcd_USB_FS;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 4
-};
 /* USER CODE BEGIN PV */
-osThreadId_t BMI323TaskHandle;
-const osThreadAttr_t BMI323Task_attributes = {
-  .name = "BMI323Task",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 128 * 8
-};
 
 /* USER CODE END PV */
 
@@ -84,15 +72,13 @@ static void MX_SPI1_Init(void);
 static void MX_IPCC_Init(void);
 static void MX_RTC_Init(void);
 static void MX_RF_Init(void);
-void StartDefaultTask(void *argument);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+struct bmi3_dev dev, dev2; // dev3, dev4, dev5, dev6, dev7, dev8, dev9, dev10, dev11;
 /* USER CODE END 0 */
 
 /**
@@ -109,9 +95,10 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+  /* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
+  MX_APPE_Config();
 
   /* USER CODE BEGIN Init */
-  MX_APPE_Config();
 
   /* USER CODE END Init */
 
@@ -140,49 +127,145 @@ int main(void)
 
   /* USER CODE END 2 */
 
-  /* Init scheduler */
-  osKernelInitialize();
+  /* Init code for STM32_WPAN */
+  MX_APPE_Init();
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  BMI323TaskHandle = osThreadNew(StartBMI323Task, NULL, &BMI323Task_attributes);
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+	int8_t rslt = BMI3_OK;
+	uint8_t flag;
+
+/* Implementation of the sensor read/write function cannot really be changed so here we go*/
+	dev.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read1;
+	dev.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write1;
+	Init_BMI323(&dev);
+	HAL_Delay(10);
+
+	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
+	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
+	Init_BMI323(&dev2);
+
+//	clock_t start, end;
+//	double cpu_time_used;
+
+//	HAL_Delay(10);
+//
+//	dev3.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
+//	dev3.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev4.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read4;
+//	dev4.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write4;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev5.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read5;
+//	dev5.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write5;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev6.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read6;
+//	dev6.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write6;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev7.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read7;
+//	dev7.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write7;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev8.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read8;
+//	dev8.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write8;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev9.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read9;
+//	dev9.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write9;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev10.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read10;
+//	dev10.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write10;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+//
+//	dev11.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read11;
+//	dev11.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write11;
+//	Init_BMI323(&dev);
+//	HAL_Delay(10);
+
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
+    float data[] = {0,0,0,0,0,0};
+
+//    start = clock();
+
+    bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+	if((flag & 0x40) == 0) continue;
+	read_sensor(dev, data);
+	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+	if((flag & 0x40) == 0) continue;
+	read_sensor(dev2, data);
+//	HAL_Delay(1);
+//
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev, data);
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev2, data);
+//	HAL_Delay(1);
+//
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev, data);
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev2, data);
+//	HAL_Delay(1);
+//
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev, data);
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev2, data);
+//	HAL_Delay(1);
+//
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev, data);
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev2, data);
+//	HAL_Delay(1);
+//
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev, data);
+//
+//	end = clock();
+//	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+//	PDEBUG("Execution time: %f seconds\n", cpu_time_used);
+
+	PDEBUG("1:\n");
+	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
+	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
+
+	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+	if((flag & 0x40) == 0) continue;
+	read_sensor(dev2, data);
+
+	PDEBUG("2:\n");
+	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
+	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
+	HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -347,8 +430,8 @@ static void MX_RTC_Init(void)
   */
   hrtc.Instance = RTC;
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-  hrtc.Init.AsynchPrediv = 127;
-  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.AsynchPrediv = CFG_RTC_ASYNCH_PRESCALER;
+  hrtc.Init.SynchPrediv = CFG_RTC_SYNCH_PRESCALER;
   hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
   hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
   hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
@@ -503,16 +586,16 @@ static void MX_DMA_Init(void)
 
   /* DMA interrupt init */
   /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* DMA1_Channel2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
   /* DMA1_Channel3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
   /* DMA1_Channel4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
 
 }
@@ -581,45 +664,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(100);
-  }
-  /* USER CODE END 5 */
-}
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM2 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM2) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.

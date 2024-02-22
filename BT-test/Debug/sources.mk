@@ -31,12 +31,8 @@ Middlewares/ST/STM32_WPAN/ble/svc/Src \
 Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/shci \
 Middlewares/ST/STM32_WPAN/interface/patterns/ble_thread/tl \
 Middlewares/ST/STM32_WPAN/utilities \
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 \
-Middlewares/Third_Party/FreeRTOS/Source \
-Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F \
-Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang \
 STM32_WPAN/App \
 STM32_WPAN/Target \
 Utilities/lpm/tiny_lpm \
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
+Utilities/sequencer \
 
