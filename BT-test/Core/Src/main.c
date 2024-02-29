@@ -85,6 +85,67 @@ struct bmi3_dev dev, dev2; // dev3, dev4, dev5, dev6, dev7, dev8, dev9, dev10, d
   * @brief  The application entry point.
   * @retval int
   */
+
+void InitializeHand(Finger *finger,
+		vec3 *hand_basis,
+		rotation_vec3 *rotation_data,
+		FingerSensorData *finger_sensor_data
+		) {
+	*finger = (Finger) {
+		.basis = {(vec3) {1, 0, 0},
+				  (vec3) {0, 1, 0},
+				  (vec3) {0, 0, 1}},
+		.bend = 0
+	};
+
+	PDEBUG("demo finger:\n");
+	PDEBUG("X: [%f, %f, %f]\n", finger->basis[0].x, finger->basis[0].y, finger->basis[0].z);
+	PDEBUG("Y: [%f, %f, %f]\n", finger->basis[1].x, finger->basis[1].y, finger->basis[1].z);
+	PDEBUG("Z: [%f, %f, %f]\n", finger->basis[2].x, finger->basis[2].y, finger->basis[2].z);
+
+
+	hand_basis[0] = (vec3) {1, 0, 0};
+	hand_basis[1] = (vec3) {0, 1, 0};
+	hand_basis[2] = (vec3) {0, 0, 1};
+	PDEBUG("hand basis:\n");
+
+	*rotation_data = (rotation_vec3) {
+		.roll = 0,
+		.pitch = 0,
+		.yaw = 0
+	};
+	PDEBUG("rotation data:\n");
+
+	*finger_sensor_data = (FingerSensorData) {
+			.base = *rotation_data,
+			.tip = *rotation_data
+	};
+	PDEBUG("finger sensor data:\n");
+	PDEBUG("demo finger:\n");
+	PDEBUG("X: [%f, %f, %f]\n", finger->basis[0].x, finger->basis[0].y, finger->basis[0].z);
+	PDEBUG("Y: [%f, %f, %f]\n", finger->basis[1].x, finger->basis[1].y, finger->basis[1].z);
+	PDEBUG("Z: [%f, %f, %f]\n", finger->basis[2].x, finger->basis[2].y, finger->basis[2].z);
+
+}
+
+void print_angles_from_matrix(vec3 matrix[3]) {
+	const double rad_to_deg = 180/3.14159;
+	double pitch = asin(matrix[2].x) * rad_to_deg;
+	double roll, yaw;
+	if (abs(pitch) != 90) {
+		roll = atan2(matrix[2].y / cos(pitch), matrix[2].z / cos(pitch)) * rad_to_deg;
+		yaw = atan2(matrix[1].x / cos(pitch), matrix[0].x / cos(pitch)) * rad_to_deg;
+	}
+	else if((int)pitch == 90){
+		roll = atan2(matrix[0].y, matrix[0].z) * rad_to_deg;
+		yaw = 0;
+	} else if((int)(pitch) == -90){
+		roll = atan2(-matrix[0].y, -matrix[0].z) * rad_to_deg;
+		yaw = 0;
+	}
+	PDEBUG("Roll: %.2f, Pitch: %.2f, Yaw: %.2f", roll, pitch, yaw);
+}
+
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -142,9 +203,20 @@ int main(void)
 	Init_BMI323(&dev);
 	HAL_Delay(10);
 
-	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
-	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
-	Init_BMI323(&dev2);
+	Finger finger;
+	vec3 stub_hand_basis[3];
+	rotation_vec3 rotation_data;
+	FingerSensorData finger_sensor_data;
+	InitializeHand(&finger, stub_hand_basis, &rotation_data, &finger_sensor_data);
+	const unsigned long CYCLES_PER_MS = 80000;
+	unsigned long t1;
+	unsigned long t2;
+	unsigned long diff;
+	int frequency;
+
+//	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
+//	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
+//	Init_BMI323(&dev2);
 
 //	clock_t start, end;
 //	double cpu_time_used;
@@ -258,14 +330,36 @@ int main(void)
 	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
 	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
 
-	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-	if((flag & 0x40) == 0) continue;
-	read_sensor(dev2, data);
+	rotation_data.roll = data[0];
+	rotation_data.pitch = data[1];
+	rotation_data.yaw = data[2];
 
-	PDEBUG("2:\n");
-	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
-	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
-	HAL_Delay(500);
+	finger_sensor_data.base = rotation_data;
+	PDEBUG("Finger Base roll: %f:\n", finger_sensor_data.base.roll);
+	PDEBUG("Finger Base pitch: %f:\n", finger_sensor_data.base.pitch);
+	PDEBUG("Finger Base yaw: %f:\n", finger_sensor_data.base.yaw);
+
+	finger_sensor_data.tip = rotation_data;
+
+	t2 = DWT->CYCCNT;
+	diff = t2 - t1;
+	frequency = diff / CYCLES_PER_MS;
+	update_finger(&finger, &finger_sensor_data, frequency, &stub_hand_basis);
+	t1 = DWT->CYCCNT;
+	PDEBUG("Finger Basis:\n");
+	PDEBUG("X: [%f, %f, %f]\n", finger.basis[0].x, finger.basis[0].y, finger.basis[0].z);
+	PDEBUG("Y: [%f, %f, %f]\n", finger.basis[1].x, finger.basis[1].y, finger.basis[1].z);
+	PDEBUG("Z: [%f, %f, %f]\n", finger.basis[2].x, finger.basis[2].y, finger.basis[2].z);
+	print_angles_from_matrix(finger.basis);
+
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	if((flag & 0x40) == 0) continue;
+//	read_sensor(dev2, data);
+
+//	PDEBUG("2:\n");
+//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
+//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
+	HAL_Delay(frequency);
   }
   /* USER CODE END 3 */
 }
