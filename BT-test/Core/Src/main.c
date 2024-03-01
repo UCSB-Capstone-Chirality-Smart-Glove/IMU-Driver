@@ -208,7 +208,7 @@ int main(void)
 	rotation_vec3 rotation_data;
 	FingerSensorData finger_sensor_data;
 	InitializeHand(&finger, stub_hand_basis, &rotation_data, &finger_sensor_data);
-	const unsigned long CYCLES_PER_MS = 80000;
+	const unsigned long CYCLES_PER_MS = 64000;
 	unsigned long t1;
 	unsigned long t2;
 	unsigned long diff;
@@ -343,7 +343,7 @@ int main(void)
 
 	t2 = DWT->CYCCNT;
 	diff = t2 - t1;
-	frequency = diff / CYCLES_PER_MS;
+	frequency = diff / CYCLES_PER_MS + 5;
 	update_finger(&finger, &finger_sensor_data, frequency, &stub_hand_basis);
 	t1 = DWT->CYCCNT;
 	PDEBUG("Finger Basis:\n");
@@ -359,7 +359,7 @@ int main(void)
 //	PDEBUG("2:\n");
 //	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[0], data[1], data[2]);
 //	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data[3], data[4], data[5]);
-	HAL_Delay(frequency);
+	HAL_Delay(200 + frequency);
   }
   /* USER CODE END 3 */
 }
