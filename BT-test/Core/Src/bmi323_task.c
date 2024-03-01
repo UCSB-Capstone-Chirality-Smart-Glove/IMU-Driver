@@ -250,15 +250,15 @@ int8_t Open_BMI323_ACC(struct bmi3_dev *dev)
 
 			/* Get the configuration settings for validation */
 			rslt = bmi323_get_sensor_config(&config, 1, dev);
-//			if (rslt == BMI3_OK)
-//			{
+			if (rslt == BMI3_OK)
+			{
 //				PDEBUG("Get ACC configuration successful\r\n");
 //				PDEBUG("acc_mode = %d\r\n", config.cfg.acc.acc_mode);
 //				PDEBUG("bwp = %d\r\n", config.cfg.acc.bwp);
 //				PDEBUG("odr = %d\r\n", config.cfg.acc.odr);
 //				PDEBUG("Range = %d\r\n", config.cfg.acc.range);
 //				PDEBUG("avg_num = %d\r\n", config.cfg.acc.avg_num);
-//			}
+			}
 		}
 	}
 

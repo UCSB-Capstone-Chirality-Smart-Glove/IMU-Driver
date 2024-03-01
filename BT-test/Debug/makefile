@@ -70,8 +70,8 @@ all: main-build
 main-build: BT-test.elf secondary-outputs
 
 # Tool invocations
-BT-test.elf BT-test.map: $(OBJS) $(USER_OBJS) H:\UCclass\capstone\Project\BT-test\STM32WB55RGVX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "BT-test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"H:\UCclass\capstone\Project\BT-test\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BT-test.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+BT-test.elf BT-test.map: $(OBJS) $(USER_OBJS) C:\Users\philp\Downloads\BT-test\STM32WB55RGVX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "BT-test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\philp\Downloads\BT-test\STM32WB55RGVX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BT-test.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -8,8 +8,8 @@
 
 int8_t SensorAPI_SPIx_Read1(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
 int8_t SensorAPI_SPIx_Read2(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
-//int8_t SensorAPI_SPIx_Read3(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
-//int8_t SensorAPI_SPIx_Read4(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
+int8_t SensorAPI_SPIx_Read3(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
+int8_t SensorAPI_SPIx_Read4(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Read5(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Read6(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Read7(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr);
@@ -20,8 +20,8 @@ int8_t SensorAPI_SPIx_Read2(uint8_t reg_addr, uint8_t *reg_data, uint32_t length
 
 int8_t SensorAPI_SPIx_Write1(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
 int8_t SensorAPI_SPIx_Write2(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
-//int8_t SensorAPI_SPIx_Write3(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
-//int8_t SensorAPI_SPIx_Write4(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
+int8_t SensorAPI_SPIx_Write3(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
+int8_t SensorAPI_SPIx_Write4(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Write5(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Write6(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);
 //int8_t SensorAPI_SPIx_Write7(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr);

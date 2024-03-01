@@ -14,7 +14,11 @@ uint8_t GTXBuffer[512], GRXBuffer[2048];
 #define port1 GPIOA
 #define pin1 GPIO_PIN_4
 #define port2 GPIOA
-#define pin2 GPIO_PIN_5
+#define pin2 GPIO_PIN_3
+#define port3 GPIOA
+#define pin3 GPIO_PIN_9
+#define port4 GPIOA
+#define pin4 GPIO_PIN_2
 
 int8_t SensorAPI_SPIx_Read1(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {
@@ -46,36 +50,36 @@ int8_t SensorAPI_SPIx_Read2(uint8_t reg_addr, uint8_t *reg_data, uint32_t length
     return 0;
 }
 
-//int8_t SensorAPI_SPIx_Read3(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
-//{
-//    GTXBuffer[0] = reg_addr | 0x80;
-//
-//    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_RESET); // NSS low
-//
-//    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
-//    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-//
-//    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_SET); // NSS high
-//    memcpy(reg_data, GRXBuffer+1, length);
-//
-//    return 0;
-//}
-//
-//int8_t SensorAPI_SPIx_Read4(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
-//{
-//    GTXBuffer[0] = reg_addr | 0x80;
-//
-//    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_RESET); // NSS low
-//
-//    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
-//    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-//
-//    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_SET); // NSS high
-//    memcpy(reg_data, GRXBuffer+1, length);
-//
-//    return 0;
-//}
-//
+int8_t SensorAPI_SPIx_Read3(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
+{
+    GTXBuffer[0] = reg_addr | 0x80;
+
+    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_RESET); // NSS low
+
+    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
+    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
+
+    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_SET); // NSS high
+    memcpy(reg_data, GRXBuffer+1, length);
+
+    return 0;
+}
+
+int8_t SensorAPI_SPIx_Read4(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
+{
+    GTXBuffer[0] = reg_addr | 0x80;
+
+    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_RESET); // NSS low
+
+    HAL_SPI_TransmitReceive(&SPI_HANDLE, GTXBuffer, GRXBuffer, length+1, BUS_TIMEOUT); // timeout 1000msec;
+    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
+
+    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_SET); // NSS high
+    memcpy(reg_data, GRXBuffer+1, length);
+
+    return 0;
+}
+
 //int8_t SensorAPI_SPIx_Read5(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 //{
 //    GTXBuffer[0] = reg_addr | 0x80;
@@ -212,36 +216,36 @@ int8_t SensorAPI_SPIx_Write2(uint8_t reg_addr, const uint8_t *reg_data, uint32_t
     return 0;
 }
 
-//int8_t SensorAPI_SPIx_Write3(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
-//{
-//    GTXBuffer[0] = reg_addr & 0x7F;
-//    memcpy(&GTXBuffer[1], reg_data, length);
-//
-//    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_RESET); // NSS low
-//
-//    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
-//    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-//
-//    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_SET); // NSS high
-//
-//    return 0;
-//}
-//
-//int8_t SensorAPI_SPIx_Write4(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
-//{
-//    GTXBuffer[0] = reg_addr & 0x7F;
-//    memcpy(&GTXBuffer[1], reg_data, length);
-//
-//    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_RESET); // NSS low
-//
-//    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
-//    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
-//
-//    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_SET); // NSS high
-//
-//    return 0;
-//}
-//
+int8_t SensorAPI_SPIx_Write3(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
+{
+    GTXBuffer[0] = reg_addr & 0x7F;
+    memcpy(&GTXBuffer[1], reg_data, length);
+
+    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_RESET); // NSS low
+
+    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
+    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
+
+    HAL_GPIO_WritePin(port3, pin3, GPIO_PIN_SET); // NSS high
+
+    return 0;
+}
+
+int8_t SensorAPI_SPIx_Write4(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
+{
+    GTXBuffer[0] = reg_addr & 0x7F;
+    memcpy(&GTXBuffer[1], reg_data, length);
+
+    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_RESET); // NSS low
+
+    HAL_SPI_Transmit(&SPI_HANDLE, GTXBuffer, length+1, BUS_TIMEOUT); // send register address + write data
+    while(SPI_HANDLE.State == HAL_SPI_STATE_BUSY);  // wait for xmission complete
+
+    HAL_GPIO_WritePin(port4, pin4, GPIO_PIN_SET); // NSS high
+
+    return 0;
+}
+
 //int8_t SensorAPI_SPIx_Write5(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length, void *intf_ptr)
 //{
 //    GTXBuffer[0] = reg_addr & 0x7F;
