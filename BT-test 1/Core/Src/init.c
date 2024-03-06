@@ -12,9 +12,9 @@ extern SPI_HandleTypeDef hspi1;
 uint8_t GTXBuffer[512], GRXBuffer[2048];
 
 #define port1 GPIOA
-#define pin1 GPIO_PIN_4
+#define pin1 GPIO_PIN_3
 #define port2 GPIOA
-#define pin2 GPIO_PIN_3
+#define pin2 GPIO_PIN_4
 #define port3 GPIOA
 #define pin3 GPIO_PIN_9
 #define port4 GPIOA
