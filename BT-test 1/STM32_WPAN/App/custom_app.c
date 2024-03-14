@@ -55,7 +55,7 @@ typedef struct
 
 /* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOTIFICATION_INTERVAL_MS 1
+#define NOTIFICATION_INTERVAL_MS 1000
 /* USER CODE END PD */
 
 /* Private macros -------------------------------------------------------------*/
@@ -148,6 +148,12 @@ void myTask(void)
     uint32_t currentTick = HAL_GetTick();
 
     if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
+        if (UpdateCharData[0] == 180) {
+            UpdateCharData[0] = 0;
+        } else {
+            UpdateCharData[0] += 1;
+        }
+        Custom_F1_Update_Char();
 
         UpdateCharData2[0] = (charValue2 >> 8) & 0xFF;
         UpdateCharData2[1] = charValue2 & 0xFF;
@@ -193,7 +199,7 @@ void myTask(void)
 //	PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI4[0], dataI4[1], dataI4[2]);
 //	PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI4[3], dataI4[4], dataI4[5]);
 
-//    HAL_Delay(500);
+//    HAL_Delay(1000);
     UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF, CFG_SCH_PRIO_0);
 }
 
@@ -439,7 +445,7 @@ void Custom_F1_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData2);
   }
 
   /* USER CODE BEGIN F1_UC_Last*/
@@ -478,7 +484,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData2);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData3);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
@@ -517,7 +523,7 @@ void Custom_F3_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData3);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData4);
   }
 
   /* USER CODE BEGIN F3_UC_Last*/
@@ -556,7 +562,7 @@ void Custom_F4_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData4);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData5);
   }
 
   /* USER CODE BEGIN F4_UC_Last*/
@@ -595,7 +601,7 @@ void Custom_Tdata_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_TDATA, (uint8_t *)UpdateCharData5);
+    Custom_STM_App_Update_Char(CUSTOM_STM_TDATA, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN Tdata_UC_Last*/
