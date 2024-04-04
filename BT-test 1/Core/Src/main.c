@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "bmi323_task.h"
 #include "init.h"
+#include "adc.h"
 
 /* USER CODE END Includes */
 
@@ -42,6 +43,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
 IPCC_HandleTypeDef hipcc;
 
 RTC_HandleTypeDef hrtc;
@@ -68,6 +72,7 @@ static void MX_USB_PCD_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_IPCC_Init(void);
 static void MX_RTC_Init(void);
+static void MX_ADC1_Init(void);
 static void MX_RF_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -119,6 +124,7 @@ int main(void)
   MX_USB_PCD_Init();
   MX_SPI1_Init();
   MX_RTC_Init();
+  MX_ADC1_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
 
@@ -189,12 +195,25 @@ int main(void)
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
 
+	uint8_t dataNum = 50;
+	uint16_t ADCValue = 0;
+	double Voltage[50];
+	double badDate[50];
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&ADCValue, 1);
+
   while (1)
   {
     /* USER CODE END WHILE */
     MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
+	  for (int i = 0; i < 50; i++)
+		  {
+			Voltage[i] = ADCValue * 3.3 / 4096;
+			HAL_Delay(500);
+		  }
+		  double avg = Detection(Voltage, badDate, dataNum, 4);
+		  printf("Flex Sensor Value : %.3f", avg);
 
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
 //	if((flag & 0x40) == 0) continue;
@@ -312,7 +331,15 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SMPS|RCC_PERIPHCLK_RFWAKEUP;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SMPS|RCC_PERIPHCLK_RFWAKEUP
+                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC;
+  PeriphClkInitStruct.PLLSAI1.PLLN = 24;
+  PeriphClkInitStruct.PLLSAI1.PLLP = RCC_PLLP_DIV2;
+  PeriphClkInitStruct.PLLSAI1.PLLQ = RCC_PLLQ_DIV2;
+  PeriphClkInitStruct.PLLSAI1.PLLR = RCC_PLLR_DIV2;
+  PeriphClkInitStruct.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_USBCLK|RCC_PLLSAI1_ADCCLK;
+  PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLLSAI1;
+  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLLSAI1;
   PeriphClkInitStruct.RFWakeUpClockSelection = RCC_RFWKPCLKSOURCE_LSE;
   PeriphClkInitStruct.SmpsClockSelection = RCC_SMPSCLKSOURCE_HSI;
   PeriphClkInitStruct.SmpsDivSelection = RCC_SMPSCLKDIV_RANGE0;
@@ -324,6 +351,64 @@ void PeriphCommonClock_Config(void)
   /* USER CODE BEGIN Smps */
 
   /* USER CODE END Smps */
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc1.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -554,6 +639,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+  /* DMA1_Channel3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
 
 }
 

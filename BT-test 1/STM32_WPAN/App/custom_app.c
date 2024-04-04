@@ -445,7 +445,7 @@ void Custom_F1_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData2);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F1_UC_Last*/
@@ -484,7 +484,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData3);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
@@ -523,7 +523,7 @@ void Custom_F3_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData4);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F3_UC_Last*/
@@ -562,7 +562,7 @@ void Custom_F4_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData5);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F4_UC_Last*/
