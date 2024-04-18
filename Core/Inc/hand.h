@@ -9,6 +9,7 @@
 typedef struct {
     Finger finger[4];
     Thumb thumb;
+    float web_angles[3];
     vec3 basis[3];
 } Hand;
 

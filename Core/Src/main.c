@@ -79,6 +79,7 @@ struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, d
 Finger finger;
 vec3 stub_hand_basis[3];
 rotation_vec3 rotation_data;
+rotation_vec3 hand_rotation_data;
 FingerSensorData finger_sensor_data;
 
 /* USER CODE END 0 */
@@ -193,13 +194,15 @@ int main(void)
 //	dev11.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write11;
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
-
+//  PDEBUG("Initialize hand\n");
   InitializeHand(&finger, stub_hand_basis, &rotation_data, &rotation_data, &finger_sensor_data);
   int frequency = 10;
   float data1[] = {0,0,0,0,0,0};
   float data2[] = {0,0,0,0,0,0};
+//  float data3[] = {0,0,0,0,0,0};
   uint16_t dataI1[] = {0,0,0,0,0,0};
   uint16_t dataI2[] = {0,0,0,0,0,0};
+//  uint16_t dataI3[] = {0,0,0,0,0,0};
   while (1)
   {
     /* USER CODE END WHILE */
@@ -208,6 +211,7 @@ int main(void)
 	while((flag & 0x40) == 0) break;
 	read_sensor(dev, data1, dataI1);
 	read_sensor(dev2, data2, dataI2);
+//	read_sensor(dev3, data3, dataI3);
 
 	finger_sensor_data.base.roll = data1[0];
 	finger_sensor_data.base.pitch = data1[1];
@@ -217,11 +221,15 @@ int main(void)
 	finger_sensor_data.tip.pitch = data2[1];
 	finger_sensor_data.tip.yaw = data2[2];
 
-	update_finger(&finger, &finger_sensor_data, frequency, stub_hand_basis);
-	rotation_vec3 angles = matrix_to_euler(finger.basis);
-	PDEBUG("Roll: %d\n", (int)angles.roll);
-	PDEBUG("Pitch: %d\n", (int)angles.pitch);
-	PDEBUG("Yaw: %d\n", (int)angles.yaw);
+//	hand_rotation_data.roll = data3[0];
+//	hand_rotation_data.pitch = data3[1];
+//	hand_rotation_data.yaw = data3[2];
+
+	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
+//	rotation_vec3 angles = matrix_to_euler(finger.basis);
+	PDEBUG("Roll: %d\n", (int)finger_sensor_data.base.roll);
+	PDEBUG("Pitch: %d\n", (int)finger_sensor_data.base.pitch);
+	PDEBUG("Yaw: %d\n", (int)finger_sensor_data.base.yaw);
 	PDEBUG("Bend: %d\n", finger.bend);
 
 //    MX_APPE_Process();

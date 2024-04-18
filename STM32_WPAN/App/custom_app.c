@@ -104,6 +104,7 @@ extern struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, d
 extern Finger finger;
 extern vec3 stub_hand_basis[3];
 extern rotation_vec3 rotation_data;
+extern rotation_vec3 hand_rotation_data;
 extern FingerSensorData finger_sensor_data;
 
 const unsigned long CYCLES_PER_MS = 64000;
@@ -152,7 +153,7 @@ void myTask(void)
 //	finger_sensor_data.base.pitch = data2[1];
 //	finger_sensor_data.base.yaw = data2[2];
 
-	update_finger(&finger, &finger_sensor_data, frequency, stub_hand_basis);
+	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev3);
 //	while((flag & 0x40) == 0) break;
@@ -164,16 +165,16 @@ void myTask(void)
 //	HAL_Delay(10);
 
 	/* BLE transfer */
-	rotation_vec3 angles = matrix_to_euler(finger.basis);
+//	rotation_vec3 angles = matrix_to_euler(finger.basis);
 
 //	charValue2 = finger.bend;
 //	charValue3 = finger.bend;
 //	charValue4 = finger.bend;
 //	charValue5 = finger.bend;
 
-	charValue2 = (int)angles.roll;
-	charValue3 = (int)angles.pitch;
-	charValue4 = (int)angles.yaw;
+	charValue2 = (int)hand_rotation_data.roll;
+	charValue3 = (int)hand_rotation_data.pitch;
+	charValue4 = (int)hand_rotation_data.yaw;
 	charValue5 = finger.bend;
 
 //	charValue2 = dataI2[0];
