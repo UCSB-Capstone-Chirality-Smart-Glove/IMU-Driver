@@ -28,7 +28,9 @@ typedef struct {
 // Returns change in bend in degrees
 // - base: rotation_vec3 containing angular rate data
 // - tip: rotation_vec3 with angular rate data
-int16_t get_curl(FingerSensorData* finger_data, int16_t frequency);
+float get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency);
+
+float get_curl(FingerSensorData* finger_data, int16_t frequency);
 
 // Sets finger direction to vector [1, 0, 0] and bend to 0
 // potentially recalibrate using accelerometer and gravity in the future

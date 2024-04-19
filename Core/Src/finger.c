@@ -2,11 +2,11 @@
 #include "finger.h"
 
 
-int16_t get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency) {
+float get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency) {
     return (hand_data.roll - base_data.roll)/frequency;
 }
 
-int16_t get_curl(FingerSensorData* finger_data, int16_t frequency) {
+float get_curl(FingerSensorData* finger_data, int16_t frequency) {
     return (finger_data->base.roll - finger_data->tip.roll)/frequency;
 }
 

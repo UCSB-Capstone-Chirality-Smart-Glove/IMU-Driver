@@ -225,12 +225,18 @@ int main(void)
 //	hand_rotation_data.pitch = data3[1];
 //	hand_rotation_data.yaw = data3[2];
 
+	hand_rotation_data.roll = 0;
+	hand_rotation_data.pitch = 0;
+	hand_rotation_data.yaw = 0;
+
+
 	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //	rotation_vec3 angles = matrix_to_euler(finger.basis);
 	PDEBUG("Roll: %d\n", (int)finger_sensor_data.base.roll);
 	PDEBUG("Pitch: %d\n", (int)finger_sensor_data.base.pitch);
 	PDEBUG("Yaw: %d\n", (int)finger_sensor_data.base.yaw);
-	PDEBUG("Bend: %d\n", finger.bend);
+	PDEBUG("Bend: %d\n", (int)finger.bend);
+	PDEBUG("Curl: %d\n", (int)finger.curl);
 
 //    MX_APPE_Process();
 
