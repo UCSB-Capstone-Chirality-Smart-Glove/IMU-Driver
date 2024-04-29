@@ -22,8 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bmi323_task.h"
-#include "init.h"
-#include "adc.h"
+#include "SPI_init.h"
+#include "ADS1115.h"
 
 /* USER CODE END Includes */
 
@@ -44,7 +44,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-DMA_HandleTypeDef hdma_adc1;
+
+I2C_HandleTypeDef hi2c1;
 
 IPCC_HandleTypeDef hipcc;
 
@@ -73,6 +74,7 @@ static void MX_SPI1_Init(void);
 static void MX_IPCC_Init(void);
 static void MX_RTC_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_I2C1_Init(void);
 static void MX_RF_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -81,6 +83,8 @@ static void MX_RF_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
+float flexData[] = {0,0,0,0};
+
 /* USER CODE END 0 */
 
 /**
@@ -125,6 +129,7 @@ int main(void)
   MX_SPI1_Init();
   MX_RTC_Init();
   MX_ADC1_Init();
+  MX_I2C1_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
 
@@ -145,10 +150,10 @@ int main(void)
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
 
-	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
-	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
-	Init_BMI323(&dev2);
-	HAL_Delay(10);
+//	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
+//	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
+//	Init_BMI323(&dev2);
+//	HAL_Delay(10);
 
 //	dev3.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
 //	dev3.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
@@ -162,58 +167,54 @@ int main(void)
 
 //	dev5.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read5;
 //	dev5.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write5;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev5);
 //	HAL_Delay(10);
 //
 //	dev6.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read6;
 //	dev6.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write6;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev6);
 //	HAL_Delay(10);
 //
 //	dev7.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read7;
 //	dev7.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write7;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev7);
 //	HAL_Delay(10);
 //
 //	dev8.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read8;
 //	dev8.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write8;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev8);
 //	HAL_Delay(10);
 //
 //	dev9.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read9;
 //	dev9.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write9;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev9);
 //	HAL_Delay(10);
 //
 //	dev10.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read10;
 //	dev10.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write10;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev10);
 //	HAL_Delay(10);
 //
 //	dev11.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read11;
 //	dev11.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write11;
-//	Init_BMI323(&dev);
+//	Init_BMI323(&dev11);
 //	HAL_Delay(10);
-
-	uint8_t dataNum = 50;
-	uint16_t ADCValue = 0;
-	double Voltage[50];
-	double badDate[50];
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)&ADCValue, 1);
 
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_APPE_Process();
+//    MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
-	  for (int i = 0; i < 50; i++)
-		  {
-			Voltage[i] = ADCValue * 3.3 / 4096;
-			HAL_Delay(500);
-		  }
-		  double avg = Detection(Voltage, badDate, dataNum, 4);
-		  printf("Flex Sensor Value : %.3f", avg);
+	  uint16_t raw;
+	  HAL_ADC_Start(&hadc1);
+	  HAL_ADC_PollForConversion(&hadc1, 10);
+	  raw = HAL_ADC_GetValue(&hadc1);
+	  PDEBUG("ADC: %d ", raw);
+
+	  getFlexData(flexData);
+	  PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
+	  HAL_Delay(100);
 
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
 //	if((flag & 0x40) == 0) continue;
@@ -222,34 +223,14 @@ int main(void)
 //	if((flag & 0x40) == 0) continue;
 //	read_sensor(dev2, data);
 //	HAL_Delay(1);
-//
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev, data);
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev2, data);
-//	HAL_Delay(1);
-//
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev, data);
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev2, data);
-//	HAL_Delay(1);
-//
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev, data);
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev2, data);
-//	HAL_Delay(1);
-//
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-//	if((flag & 0x40) == 0) continue;
-//	read_sensor(dev, data);
+
+    /* Data monitor */
+//  PDEBUG("1:\n");
+//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data1[0], data1[1], data1[2]);
+//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data1[3], data1[4], data1[5]);
+//  PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI1[0], dataI1[1], dataI1[2]);
+//  PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI1[3], dataI1[4], dataI1[5]);
+
   }
   /* USER CODE END 3 */
 }
@@ -380,7 +361,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -408,6 +389,54 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x00707CBB;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -639,9 +668,6 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
-  /* DMA1_Channel3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
 
 }
 
@@ -658,9 +684,9 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3

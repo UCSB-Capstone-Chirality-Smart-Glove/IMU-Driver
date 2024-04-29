@@ -101,8 +101,14 @@ uint16_t dataI4[] = {0,0,0,0,0,0};
 
 extern struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
 
+extern ADC_HandleTypeDef hadc1;
+
 int8_t rslt = BMI3_OK;
 uint8_t flag;
+
+uint8_t dataNum = 50;
+uint16_t ADCValue = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,14 +127,19 @@ static void Custom_Tdata_Send_Notification(void);
 /* USER CODE BEGIN PFP */
 void myTask(void)
 {
+	/* ADC data */
+	int16_t flexData[] = {0,0,0,0};
+	getFlexData(flexData);
+	HAL_Delay(500);
+
 	/* IMU grab data */
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
 //	while((flag & 0x40) == 0) break;
 //	read_sensor(dev, data1, dataI1);
 //
-	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-	while((flag & 0x40) == 0) break;
-	read_sensor(dev2, data2, dataI2);
+//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+//	while((flag & 0x40) == 0) break;
+//	read_sensor(dev2, data2, dataI2);
 //
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev3);
 //	while((flag & 0x40) == 0) break;
@@ -140,7 +151,8 @@ void myTask(void)
 //	HAL_Delay(10);
 
 	/* BLE transfer */
-	charValue2 = dataI2[0];
+//	charValue2 = dataI2[0];
+	charValue2 = ADCValue;
 	charValue3 = dataI2[1];
 	charValue4 = dataI2[2];
 	charValue5 = dataI2[3];
@@ -173,31 +185,6 @@ void myTask(void)
 
         lastNotificationTime = currentTick;
     }
-
-    /* Data monitor */
-//  PDEBUG("1:\n");
-//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data1[0], data1[1], data1[2]);
-//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data1[3], data1[4], data1[5]);
-//  PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI1[0], dataI1[1], dataI1[2]);
-//  PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI1[3], dataI1[4], dataI1[5]);
-
-//	PDEBUG("2:\n");
-//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data2[0], data2[1], data2[2]);
-//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data2[3], data2[4], data2[5]);
-//	PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI2[0], dataI2[1], dataI2[2]);
-//	PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI2[3], dataI2[4], dataI2[5]);
-
-//	PDEBUG("3:\n");
-//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data3[0], data3[1], data3[2]);
-//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data3[3], data3[4], data3[5]);
-//	PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI3[0], dataI3[1], dataI3[2]);
-//	PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI3[3], dataI3[4], dataI3[5]);
-
-//	PDEBUG("4:\n");
-//	PDEBUG("GYRO: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data4[0], data4[1], data4[2]);
-//	PDEBUG("ACC: X axis: %4.2f, Y axis: %4.2f, Z axis: %4.2f\r\n", data4[3], data4[4], data4[5]);
-//	PDEBUG("GYRO: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI4[0], dataI4[1], dataI4[2]);
-//	PDEBUG("ACC: X axis: %#16x, Y axis: %#16x, Z axis: %#16x\r\n", dataI4[3], dataI4[4], dataI4[5]);
 
 //    HAL_Delay(1000);
     UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF, CFG_SCH_PRIO_0);
