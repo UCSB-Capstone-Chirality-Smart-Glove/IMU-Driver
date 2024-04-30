@@ -39,9 +39,6 @@ typedef struct
   /* smartGlove */
   uint8_t               F1_Notification_Status;
   uint8_t               F2_Notification_Status;
-  uint8_t               F3_Notification_Status;
-  uint8_t               F4_Notification_Status;
-  uint8_t               Tdata_Notification_Status;
   /* USER CODE BEGIN CUSTOM_APP_Context_t */
 
   /* USER CODE END CUSTOM_APP_Context_t */
@@ -79,6 +76,8 @@ uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
+uint8_t fingerPacket[14];
+uint8_t handPacket[12];
 uint8_t UpdateCharData2[4];
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
@@ -126,12 +125,6 @@ static void Custom_F1_Update_Char(void);
 static void Custom_F1_Send_Notification(void);
 static void Custom_F2_Update_Char(void);
 static void Custom_F2_Send_Notification(void);
-static void Custom_F3_Update_Char(void);
-static void Custom_F3_Send_Notification(void);
-static void Custom_F4_Update_Char(void);
-static void Custom_F4_Send_Notification(void);
-static void Custom_Tdata_Update_Char(void);
-static void Custom_Tdata_Send_Notification(void);
 
 /* USER CODE BEGIN PFP */
 void myTask(void)
@@ -216,15 +209,15 @@ void myTask(void)
 
         UpdateCharData3[0] = (charValue3 >> 8) & 0xFF;
         UpdateCharData3[1] = charValue3 & 0xFF;
-        Custom_F3_Update_Char();
+
 
         UpdateCharData4[0] = (charValue4 >> 8) & 0xFF;
         UpdateCharData4[1] = charValue4 & 0xFF;
-        Custom_F4_Update_Char();
+
 
         UpdateCharData5[0] = (charValue5 >> 8) & 0xFF;
         UpdateCharData5[1] = charValue5 & 0xFF;
-        Custom_Tdata_Update_Char();
+
 
         lastNotificationTime = currentTick;
     }
@@ -258,95 +251,39 @@ void myTask(void)
     UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF, CFG_SCH_PRIO_0);
 }
 
-/*void myTask2(void)
-{
-    uint32_t currentTick = HAL_GetTick();
-
-    // Check if enough time has elapsed for the next notification
-    if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-        // Toggle between 90 and 180
-        if (UpdateCharData2[0] == 0) {
-            UpdateCharData2[0] = 100;
-            UpdateCharData2[1] = 100;
-        } else {
-        	UpdateCharData2[0] = UpdateCharData2[0] + 1;
-        	UpdateCharData2[1] = UpdateCharData2[1] + 1;
-        }
-
-        Custom_Fpos_Update_Char();
-        lastNotificationTime = currentTick;
-    }
-
-    UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF2, CFG_SCH_PRIO_0);
-}
-void myTask3(void)
-{
-    uint32_t currentTick = HAL_GetTick();
-
-    // Check if enough time has elapsed for the next notification
-    if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-        // Toggle between 90 and 180
-        if (UpdateCharData3[0] == 180) {
-            UpdateCharData3[0] = 0;
-            UpdateCharData3[1] = 0;
-        } else {
-        	UpdateCharData3[0] = UpdateCharData3[0] + 5;
-        	UpdateCharData3[1] = UpdateCharData3[0] + 5;
-        }
-
-        Custom_Fbend2_Update_Char();
-        lastNotificationTime = currentTick;
-    }
-
-
-    UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF3, CFG_SCH_PRIO_0);
+/* Helper Functions for Populating Bluetooth packets */
+void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1Bend,
+                          uint16_t finger2Curl, uint8_t finger2Bend, uint16_t finger3Curl,
+                          uint8_t finger3Bend, uint16_t finger4Curl, uint8_t finger4Bend,
+                          uint16_t thumbCurl, uint8_t thumbBend) {
+    buffer[0] = (finger1Curl >> 8) & 0xFF;
+    buffer[1] = finger1Curl & 0xFF;
+    buffer[2] = finger1Bend;
+    buffer[3] = (finger2Curl >> 8) & 0xFF;
+    buffer[4] = finger2Curl & 0xFF;
+    buffer[5] = finger2Bend;
+    buffer[6] = (finger3Curl >> 8) & 0xFF;
+    buffer[7] = finger3Curl & 0xFF;
+    buffer[8] = finger3Bend;
+    buffer[9] = (finger4Curl >> 8) & 0xFF;
+    buffer[10] = finger4Curl & 0xFF;
+    buffer[11] = finger4Bend;
+    buffer[12] = (thumbCurl >> 8) & 0xFF;
+    buffer[13] = thumbCurl & 0xFF;
+    buffer[14] = thumbBend;
 }
 
-void myTask4(void)
-{
-    uint32_t currentTick = HAL_GetTick();
-
-    // Check if enough time has elapsed for the next notification
-    if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-        // Toggle between 90 and 180
-        if (UpdateCharData4[0] == 0) {
-            UpdateCharData4[0] = 100;
-            UpdateCharData4[1] = 100;
-        } else {
-        	UpdateCharData4[0] = UpdateCharData4[0] + 1;
-        	UpdateCharData4[1] = UpdateCharData4[1] + 1;
-        }
-
-        Custom_Fpos2_Update_Char();
-        lastNotificationTime = currentTick;
-    }
-
-    UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF4, CFG_SCH_PRIO_0);
+void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVectorY,
+                        uint16_t basisVectorZ, uint8_t flexSensorPalm, uint8_t flexSensorThumbWeb) {
+    buffer[0] = (basisVectorX >> 8) & 0xFF;
+    buffer[1] = basisVectorX & 0xFF;
+    buffer[2] = (basisVectorY >> 8) & 0xFF;
+    buffer[3] = basisVectorY & 0xFF;
+    buffer[4] = (basisVectorZ >> 8) & 0xFF;
+    buffer[5] = basisVectorZ & 0xFF;
+    buffer[6] = flexSensorPalm;
+    buffer[7] = flexSensorThumbWeb;
 }
-
-void myTask5(void)
-{
-    uint32_t currentTick = HAL_GetTick();
-
-    // Check if enough time has elapsed for the next notification
-    if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-        // Toggle between 90 and 180
-        if (UpdateCharData5[0] == 180) {
-            UpdateCharData5[0] = 0;
-            UpdateCharData5[1] = 0;
-        } else {
-        	UpdateCharData5[0] = UpdateCharData5[0] + 5;
-        	UpdateCharData5[1] = UpdateCharData5[0] + 5;
-        }
-
-        Custom_Tdata_Update_Char();
-        lastNotificationTime = currentTick;
-    }
-
-
-    UTIL_SEQ_SetTask(1<<CFG_TASK_SEND_NOTIF5, CFG_SCH_PRIO_0);
-}
- */
 /* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
@@ -384,42 +321,6 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
       /* USER CODE BEGIN CUSTOM_STM_F2_NOTIFY_DISABLED_EVT */
 
       /* USER CODE END CUSTOM_STM_F2_NOTIFY_DISABLED_EVT */
-      break;
-
-    case CUSTOM_STM_F3_NOTIFY_ENABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_F3_NOTIFY_ENABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_F3_NOTIFY_ENABLED_EVT */
-      break;
-
-    case CUSTOM_STM_F3_NOTIFY_DISABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_F3_NOTIFY_DISABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_F3_NOTIFY_DISABLED_EVT */
-      break;
-
-    case CUSTOM_STM_F4_NOTIFY_ENABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_F4_NOTIFY_ENABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_F4_NOTIFY_ENABLED_EVT */
-      break;
-
-    case CUSTOM_STM_F4_NOTIFY_DISABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_F4_NOTIFY_DISABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_F4_NOTIFY_DISABLED_EVT */
-      break;
-
-    case CUSTOM_STM_TDATA_NOTIFY_ENABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_TDATA_NOTIFY_ENABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_TDATA_NOTIFY_ENABLED_EVT */
-      break;
-
-    case CUSTOM_STM_TDATA_NOTIFY_DISABLED_EVT:
-      /* USER CODE BEGIN CUSTOM_STM_TDATA_NOTIFY_DISABLED_EVT */
-
-      /* USER CODE END CUSTOM_STM_TDATA_NOTIFY_DISABLED_EVT */
       break;
 
     default:
@@ -539,7 +440,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData2);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
@@ -564,123 +465,6 @@ void Custom_F2_Send_Notification(void) /* Property Notification */
   /* USER CODE BEGIN F2_NS_Last*/
 
   /* USER CODE END F2_NS_Last*/
-
-  return;
-}
-
-void Custom_F3_Update_Char(void) /* Property Read */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN F3_UC_1*/
-  updateflag = 1;
-  /* USER CODE END F3_UC_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData);
-  }
-
-  /* USER CODE BEGIN F3_UC_Last*/
-
-  /* USER CODE END F3_UC_Last*/
-  return;
-}
-
-void Custom_F3_Send_Notification(void) /* Property Notification */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN F3_NS_1*/
-
-  /* USER CODE END F3_NS_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)NotifyCharData);
-  }
-
-  /* USER CODE BEGIN F3_NS_Last*/
-
-  /* USER CODE END F3_NS_Last*/
-
-  return;
-}
-
-void Custom_F4_Update_Char(void) /* Property Read */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN F4_UC_1*/
-  updateflag = 1;
-  /* USER CODE END F4_UC_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData);
-  }
-
-  /* USER CODE BEGIN F4_UC_Last*/
-
-  /* USER CODE END F4_UC_Last*/
-  return;
-}
-
-void Custom_F4_Send_Notification(void) /* Property Notification */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN F4_NS_1*/
-
-  /* USER CODE END F4_NS_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)NotifyCharData);
-  }
-
-  /* USER CODE BEGIN F4_NS_Last*/
-
-  /* USER CODE END F4_NS_Last*/
-
-  return;
-}
-
-void Custom_Tdata_Update_Char(void) /* Property Read */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN Tdata_UC_1*/
-  updateflag = 1;
-  /* USER CODE END Tdata_UC_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_TDATA, (uint8_t *)UpdateCharData);
-  }
-
-  /* USER CODE BEGIN Tdata_UC_Last*/
-
-  /* USER CODE END Tdata_UC_Last*/
-  return;
-}
-
-void Custom_Tdata_Send_Notification(void) /* Property Notification */
-{
-  uint8_t updateflag = 0;
-
-  /* USER CODE BEGIN Tdata_NS_1*/
-
-  /* USER CODE END Tdata_NS_1*/
-
-  if (updateflag != 0)
-  {
-    Custom_STM_App_Update_Char(CUSTOM_STM_TDATA, (uint8_t *)NotifyCharData);
-  }
-
-  /* USER CODE BEGIN Tdata_NS_Last*/
-
-  /* USER CODE END Tdata_NS_Last*/
 
   return;
 }

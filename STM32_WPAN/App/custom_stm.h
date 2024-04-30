@@ -37,28 +37,16 @@ typedef enum
   /* smartGlove */
   CUSTOM_STM_F1,
   CUSTOM_STM_F2,
-  CUSTOM_STM_F3,
-  CUSTOM_STM_F4,
-  CUSTOM_STM_TDATA,
 } Custom_STM_Char_Opcode_t;
 
 typedef enum
 {
-  /* fingerOne */
+  /* fingerPack */
   CUSTOM_STM_F1_NOTIFY_ENABLED_EVT,
   CUSTOM_STM_F1_NOTIFY_DISABLED_EVT,
-  /* fingerTwo */
+  /* handPack */
   CUSTOM_STM_F2_NOTIFY_ENABLED_EVT,
   CUSTOM_STM_F2_NOTIFY_DISABLED_EVT,
-  /* fingerThree */
-  CUSTOM_STM_F3_NOTIFY_ENABLED_EVT,
-  CUSTOM_STM_F3_NOTIFY_DISABLED_EVT,
-  /* fingerFour */
-  CUSTOM_STM_F4_NOTIFY_ENABLED_EVT,
-  CUSTOM_STM_F4_NOTIFY_DISABLED_EVT,
-  /* thumbData */
-  CUSTOM_STM_TDATA_NOTIFY_ENABLED_EVT,
-  CUSTOM_STM_TDATA_NOTIFY_DISABLED_EVT,
 
   CUSTOM_STM_BOOT_REQUEST_EVT
 } Custom_STM_Opcode_evt_t;
@@ -84,9 +72,6 @@ typedef struct
 /* Exported constants --------------------------------------------------------*/
 extern uint8_t SizeF1;
 extern uint8_t SizeF2;
-extern uint8_t SizeF3;
-extern uint8_t SizeF4;
-extern uint8_t SizeTdata;
 
 /* USER CODE BEGIN EC */
 

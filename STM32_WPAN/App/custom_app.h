@@ -69,6 +69,12 @@ void Custom_APP_Init(void);
 void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification);
 /* USER CODE BEGIN EF */
 void myTask();
+void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1Bend,
+                          uint16_t finger2Curl, uint8_t finger2Bend, uint16_t finger3Curl,
+                          uint8_t finger3Bend, uint16_t finger4Curl, uint8_t finger4Bend,
+                          uint16_t thumbCurl, uint8_t thumbBend);
+void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVectorY,
+                        uint16_t basisVectorZ, uint8_t flexSensorPalm, uint8_t flexSensorThumbWeb);
 /* USER CODE END EF */
 
 #ifdef __cplusplus
