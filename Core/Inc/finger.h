@@ -59,4 +59,10 @@ int16_t get_flex_angle(float voltage);
 // set data up to send via bluetooth
 FingerSendData package_finger_data(Finger* finger);
 
+// initialize initial finger
+void initialize_finger(Finger *finger,
+		FingerSensorData *finger_sensor_data
+		);
+
+
 #endif
