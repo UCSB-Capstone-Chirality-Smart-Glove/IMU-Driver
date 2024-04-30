@@ -89,6 +89,7 @@ uint16_t charValue3 = 0;
 uint16_t charValue4 = 0;
 uint16_t charValue5 = 0;
 
+// IMU data
 float data1[] = {0,0,0,0,0,0};
 float data2[] = {0,0,0,0,0,0};
 float data3[] = {0,0,0,0,0,0};
@@ -101,6 +102,10 @@ uint16_t dataI4[] = {0,0,0,0,0,0};
 
 extern struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
 
+// Flex Sensor Data
+float flexData[] = {0,0,0,0};
+
+// Finger Data Calculation
 extern Finger finger;
 extern vec3 stub_hand_basis[3];
 extern rotation_vec3 rotation_data;
@@ -131,11 +136,24 @@ static void Custom_Tdata_Send_Notification(void);
 /* USER CODE BEGIN PFP */
 void myTask(void)
 {
+	/* On board ADC data */
+	//	uint16_t raw;
+	//	HAL_ADC_Start(&hadc1);
+	//	HAL_ADC_PollForConversion(&hadc1, 10);
+	//	raw = HAL_ADC_GetValue(&hadc1);
+	//	float raw1 = (float) (raw + 750) / 1500 * 180;
+	//	PDEBUG("ADC: %f ", raw1);
+
+	/* Flex Sensor data */
+	getFlexData(flexData);
+	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
+	HAL_Delay(100);
+
 	/* IMU grab data */
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
 //	while((flag & 0x40) == 0) break;
 //	read_sensor(dev, data1, dataI1);
-//
+
 	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
 	while((flag & 0x40) == 0) break;
 	read_sensor(dev, data1, dataI1);
@@ -482,7 +500,7 @@ void Custom_F1_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData2);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F1_UC_Last*/
@@ -521,7 +539,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData3);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
@@ -560,7 +578,7 @@ void Custom_F3_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData4);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F3, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F3_UC_Last*/
@@ -599,7 +617,7 @@ void Custom_F4_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData5);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F4, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F4_UC_Last*/
