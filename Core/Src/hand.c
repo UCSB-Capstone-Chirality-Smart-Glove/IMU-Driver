@@ -6,10 +6,10 @@ void calibrate_hand_basis(Hand* hand) {
     hand->basis[2] = (vec3) {0, 0, 1};
 }
 
-void update_hand(Hand* hand, rotation_vec3 hand_rotation, int16_t frequency, FingerSensorData finger_data[4]) {
+void update_hand(Hand* hand, rotation_vec3* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]) {
     for (int i = 0; i < 4; i++) {
         // apply finger rotation to fingers
-        update_finger(&(hand->finger[i]), &finger_data[i], frequency, hand_rotation);
+        update_finger(hand->finger[i], &finger_data[i], frequency, hand_rotation);
     }
 
     // TODO: update web angles
@@ -18,7 +18,7 @@ void update_hand(Hand* hand, rotation_vec3 hand_rotation, int16_t frequency, Fin
 
     // update hand basis
     vec3 gyro_rotation_matrix[3];
-    fill_rotation_matrix(hand_rotation, frequency, gyro_rotation_matrix);
+    fill_rotation_matrix(*hand_rotation, frequency, gyro_rotation_matrix);
 
     // TODO: create accelerometer update matrix
     // stub:
@@ -61,36 +61,3 @@ void initialize_hand(Hand* hand, rotation_vec3* hand_sensor_data, FingerSensorDa
 		initialize_finger(hand->finger[i], &(finger_sensor_data[i]));
 	}
 }
-
-//void InitializeHand(Finger *finger,
-//		vec3 *hand_basis,
-//		rotation_vec3 *base_data,
-//		rotation_vec3 *tip_data,
-//		FingerSensorData *finger_sensor_data
-//		) {
-//	*finger = (Finger) {
-//		.curl = 0,
-//		.bend = 0
-//	};
-//
-//	hand_basis[0] = (vec3) {1, 0, 0};
-//	hand_basis[1] = (vec3) {0, 1, 0};
-//	hand_basis[2] = (vec3) {0, 0, 1};
-//
-//	*base_data = (rotation_vec3) {
-//		.roll = 0,
-//		.pitch = 0,
-//		.yaw = 0
-//	};
-//	*tip_data = (rotation_vec3) {
-//		.roll = 0,
-//		.pitch = 0,
-//		.yaw = 0
-//	};
-//
-//
-//	*finger_sensor_data = (FingerSensorData) {
-//			.base = *base_data,
-//			.tip = *tip_data
-//	};
-//}

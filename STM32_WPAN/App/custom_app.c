@@ -106,6 +106,7 @@ float flexData[] = {0,0,0,0};
 
 // Finger Data Calculation
 extern Finger finger;
+extern Hand hand;
 extern vec3 hand_basis[3];
 extern rotation_vec3 rotation_data;
 extern rotation_vec3 hand_rotation_data;
@@ -137,11 +138,6 @@ void myTask(void)
 	//	raw = HAL_ADC_GetValue(&hadc1);
 	//	float raw1 = (float) (raw + 750) / 1500 * 180;
 	//	PDEBUG("ADC: %f ", raw1);
-
-	/* Flex Sensor data */
-	getFlexData(flexData);
-	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
-	HAL_Delay(100);
 
 	/* IMU grab data */
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
@@ -180,30 +176,42 @@ void myTask(void)
     	while((flag & 0x40) == 0) break;
     	read_sensor(dev, data1, dataI1);
     	read_sensor(dev2, data2, dataI2);
+    	read_sensor(dev3, data3, dataI3);
 
-    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
+    	/* Flex Sensor data */
+//    	getFlexData(flexData);
+//    	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
+//    	HAL_Delay(100);
 
-    	}
-    	finger_sensor_data.base.roll = data1[0];
-    	finger_sensor_data.base.pitch = data1[1];
-    	finger_sensor_data.base.yaw = data1[2];
+//    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
+//
+//    	}
+    	finger_sensor_data[0].base.roll = data1[0];
+    	finger_sensor_data[0].base.pitch = data1[1];
+    	finger_sensor_data[0].base.yaw = data1[2];
 
-    	finger_sensor_data.tip.roll = data2[0];
-    	finger_sensor_data.tip.pitch = data2[1];
-    	finger_sensor_data.tip.yaw = data2[2];
+    	finger_sensor_data[0].tip.roll = data2[0];
+    	finger_sensor_data[0].tip.pitch = data2[1];
+    	finger_sensor_data[0].tip.yaw = data2[2];
 
-    	hand_rotation_data.roll = 0;
-    	hand_rotation_data.pitch = 0;
-    	hand_rotation_data.yaw = 0;
+    	hand_rotation_data.roll = data3[0];
+    	hand_rotation_data.pitch = data3[1];
+    	hand_rotation_data.yaw = data3[2];
 
     	charValue2 = (int16_t)finger.bend;
     	charValue3 = (int16_t)finger.curl;
     	charValue4 = 0;
     	charValue5 = 0;
 
-    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
-    	PDEBUG("Bend: %d\n", (int)finger.bend);
-    	PDEBUG("Curl: %d\n", (int)finger.curl);
+//    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
+    	update_hand(&hand, &hand_rotation_data, frequency, finger_sensor_data);
+    	hand_rotation_data = matrix_to_euler(hand.basis);
+    	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
+    	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
+    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
+    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
+    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
+
 
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;

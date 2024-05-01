@@ -24,12 +24,12 @@ void generate_gyroscope_update_matrix(Finger* finger, FingerSensorData* finger_d
     fill_rotation_matrix(finger_data->base, frequency, result);
 }
 
-void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, rotation_vec3 hand_data) {
+void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, rotation_vec3* hand_data) {
     // frequency adjustment factor
     const float adjustment = 1.5;
 
 	// update bend
-    float bend_change = get_bend(hand_data, finger_data->base, frequency);
+    float bend_change = get_bend(*hand_data, finger_data->base, frequency);
     finger->bend += bend_change * adjustment;
     finger->bend = fmod(finger->bend, 360);
 
@@ -45,7 +45,7 @@ void calibrate_thumb(Thumb* thumb) {
     thumb->web_angle = 0;
 }
 
-void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, rotation_vec3 hand_data) {
+void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, rotation_vec3* hand_data) {
     // could probably do some sensor fusion here to make the finger data more accurate
     update_finger(&(thumb->finger), finger_data, frequency, hand_data);
     thumb->web_angle += knuckle_rotation_change;
