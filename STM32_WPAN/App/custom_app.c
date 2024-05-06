@@ -106,10 +106,13 @@ float flexData[] = {0,0,0,0};
 
 // Finger Data Calculation
 extern Finger finger;
-extern vec3 stub_hand_basis[3];
+extern Hand hand;
+extern vec3 hand_basis[3];
 extern rotation_vec3 rotation_data;
-extern rotation_vec3 hand_rotation_data;
-extern FingerSensorData finger_sensor_data;
+extern rotation_vec3 hand_sensor_data;
+extern FingerSensorData finger_sensor_data[4];
+rotation_vec3 hand_rotation_data;
+const int ACTIVE_FINGERS = 1;
 
 const unsigned long CYCLES_PER_MS = 64000;
 unsigned long t1;
@@ -137,34 +140,10 @@ void myTask(void)
 	//	float raw1 = (float) (raw + 750) / 1500 * 180;
 	//	PDEBUG("ADC: %f ", raw1);
 
-	/* Flex Sensor data */
-	getFlexData(flexData);
-	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
-	HAL_Delay(100);
-
 	/* IMU grab data */
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
 //	while((flag & 0x40) == 0) break;
 //	read_sensor(dev, data1, dataI1);
-
-	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
-	while((flag & 0x40) == 0) break;
-	read_sensor(dev, data1, dataI1);
-		read_sensor(dev2, data2, dataI2);
-
-	finger_sensor_data.base.roll = data1[0];
-	finger_sensor_data.base.pitch = data1[1];
-	finger_sensor_data.base.yaw = data1[2];
-
-	finger_sensor_data.tip.roll = data2[0];
-	finger_sensor_data.tip.pitch = data2[1];
-	finger_sensor_data.tip.yaw = data2[2];
-
-//	finger_sensor_data.base.roll = data2[0];
-//	finger_sensor_data.base.pitch = data2[1];
-//	finger_sensor_data.base.yaw = data2[2];
-
-	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //
 //	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev3);
 //	while((flag & 0x40) == 0) break;
@@ -183,10 +162,8 @@ void myTask(void)
 //	charValue4 = finger.bend;
 //	charValue5 = finger.bend;
 
-	charValue2 = (int)hand_rotation_data.roll;
-	charValue3 = (int)hand_rotation_data.pitch;
-	charValue4 = (int)hand_rotation_data.yaw;
-	charValue5 = finger.bend;
+//	PDEBUG("Bend: %d\n", (int)finger.bend);
+//	PDEBUG("Curl: %d\n", (int)finger.curl);
 
 //	charValue2 = dataI2[0];
 //	charValue3 = dataI2[1];
@@ -196,6 +173,47 @@ void myTask(void)
     uint32_t currentTick = HAL_GetTick();
 
     if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
+    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+    	while((flag & 0x40) == 0) break;
+    	read_sensor(dev, data1, dataI1);
+    	read_sensor(dev2, data2, dataI2);
+    	read_sensor(dev3, data3, dataI3);
+
+    	/* Flex Sensor data */
+//    	getFlexData(flexData);
+//    	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
+//    	HAL_Delay(100);
+
+//    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
+//
+//    	}
+    	finger_sensor_data[0].base.roll = data1[0];
+    	finger_sensor_data[0].base.pitch = data1[1];
+    	finger_sensor_data[0].base.yaw = data1[2];
+
+    	finger_sensor_data[0].tip.roll = data2[0];
+    	finger_sensor_data[0].tip.pitch = data2[1];
+    	finger_sensor_data[0].tip.yaw = data2[2];
+
+    	hand_sensor_data.roll = data3[0];
+    	hand_sensor_data.pitch = data3[1];
+    	hand_sensor_data.yaw = data3[2];
+
+    	charValue2 = (int16_t)finger.bend;
+    	charValue3 = (int16_t)finger.curl;
+    	charValue4 = 0;
+    	charValue5 = 0;
+
+//    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
+    	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data);
+    	hand_rotation_data = matrix_to_euler(hand.basis);
+    	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
+    	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
+    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
+    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
+    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
+
+
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;
         } else {
@@ -205,6 +223,8 @@ void myTask(void)
 
         UpdateCharData2[0] = (charValue2 >> 8) & 0xFF;
         UpdateCharData2[1] = charValue2 & 0xFF;
+        UpdateCharData2[2] = (charValue3 >> 8) & 0xFF;
+        UpdateCharData2[3] = charValue3 & 0xFF;
         Custom_F2_Update_Char();
 
         UpdateCharData3[0] = (charValue3 >> 8) & 0xFF;

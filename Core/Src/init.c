@@ -11,14 +11,24 @@
 extern SPI_HandleTypeDef hspi1;
 uint8_t GTXBuffer[512], GRXBuffer[2048];
 
+//#define port1 GPIOA
+//#define pin1 GPIO_PIN_3
+//#define port2 GPIOA
+//#define pin2 GPIO_PIN_4
+//#define port3 GPIOA
+//#define pin3 GPIO_PIN_9
+//#define port4 GPIOA
+//#define pin4 GPIO_PIN_2
+
 #define port1 GPIOA
-#define pin1 GPIO_PIN_3
+#define pin1 GPIO_PIN_9
 #define port2 GPIOA
-#define pin2 GPIO_PIN_4
+#define pin2 GPIO_PIN_2
 #define port3 GPIOA
-#define pin3 GPIO_PIN_9
+#define pin3 GPIO_PIN_3
 #define port4 GPIOA
-#define pin4 GPIO_PIN_2
+#define pin4 GPIO_PIN_4
+
 
 int8_t SensorAPI_SPIx_Read1(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {

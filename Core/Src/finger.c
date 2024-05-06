@@ -3,11 +3,21 @@
 
 
 float get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency) {
-    return (hand_data.roll - base_data.roll)/frequency;
+	float gyro_bend = (hand_data.roll - base_data.roll)/frequency;
+	float difference_ratio = (hand_data.roll - base_data.roll)/((hand_data.roll + base_data.roll)/2);
+	PDEBUG("hand data roll: %d\n", (int)hand_data.roll);
+	PDEBUG("base data roll: %d\n", (int)base_data.roll);
+	PDEBUG("gyro bend change: %d\n", (int)gyro_bend);
+    if (difference_ratio < 0.025) return gyro_bend;
+    return 0;
 }
 
 float get_curl(FingerSensorData* finger_data, int16_t frequency) {
-    return (finger_data->base.roll - finger_data->tip.roll)/frequency;
+	float gyro_curl = (finger_data->base.roll - finger_data->tip.roll)/frequency;
+	PDEBUG("base roll: %d\n", (int)finger_data->base.roll);
+	PDEBUG("tip roll: %d\n", (int)finger_data->tip.roll);
+	PDEBUG("gyro curl change: %d\n", (int)gyro_curl);
+    return gyro_curl;
 }
 
 void calibrate_finger(Finger* finger) {
@@ -22,40 +32,21 @@ void generate_gyroscope_update_matrix(Finger* finger, FingerSensorData* finger_d
     fill_rotation_matrix(finger_data->base, frequency, result);
 }
 
-void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, rotation_vec3 hand_data) {
-    // create gyroscope update matrix
-    vec3 gyro_rotation_matrix[3];
-    fill_rotation_matrix(finger_data->base, frequency, gyro_rotation_matrix);
-
-    // TODO: create accelerometer update matrix
-    // stub:
-//    vec3 accel_rotation_matrix[3];
-//    accel_rotation_matrix[0] = (vec3) {1, 0, 0};
-//    accel_rotation_matrix[1] = (vec3) {0, 1, 0};
-//    accel_rotation_matrix[2] = (vec3) {0, 0, 1};
-//
-//    // take weighted average of matrices
-//    float gyro_weight = 1;
-//    float accel_weight = 0;
-//    float weights[2] = {gyro_weight, accel_weight};
-//    vec3 *matrices[2] = {gyro_rotation_matrix, accel_rotation_matrix};
-//    vec3 rotation_matrix[3];
-//    average_matrices(matrices, weights, 2, rotation_matrix);
-//
-//    vec3 temp[3];
-//    // apply rotation
-//	for (int i = 0; i < 3; i++) {
-//		temp[i] = multiply_vector_over_matrix(finger->basis, rotation_matrix[i]);
-//	}
-//	for (int i = 0; i < 3; i++) finger->basis[i] = temp[i];
+void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, rotation_vec3* hand_data) {
+    // frequency adjustment factor
+    const float adjustment = 1.5;
 
 	// update bend
-    int16_t bend_change = get_bend(hand_data, finger_data->base, frequency);
-    finger->bend += bend_change;
+    float bend_change = get_bend(*hand_data, finger_data->base, frequency);
+    if (bend_change < 150) finger->bend += bend_change;
+    finger->bend = fmod(finger->bend, 360);
+	PDEBUG("gyro bend: %d\n", (int)finger->bend);
 
     // update curl
-    int16_t curl_change = get_curl(finger_data, frequency);
-    finger->curl += curl_change;
+    float curl_change = get_curl(finger_data, frequency);
+	PDEBUG("Curl change: %d\n", (int)curl_change);
+    if (fabs(curl_change) < 150) finger->curl += curl_change;
+    finger->curl = fmod(finger->curl, 360);
 }
 
 void calibrate_thumb(Thumb* thumb) {
@@ -63,8 +54,34 @@ void calibrate_thumb(Thumb* thumb) {
     thumb->web_angle = 0;
 }
 
-void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, rotation_vec3 hand_data) {
+void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, rotation_vec3* hand_data) {
     // could probably do some sensor fusion here to make the finger data more accurate
     update_finger(&(thumb->finger), finger_data, frequency, hand_data);
     thumb->web_angle += knuckle_rotation_change;
+}
+
+void initialize_finger(Finger *finger,
+		FingerSensorData *finger_sensor_data
+		) {
+	*finger = (Finger) {
+		.curl = 0,
+		.bend = 0
+	};
+
+	rotation_vec3 base_data = (rotation_vec3) {
+		.roll = 0,
+		.pitch = 0,
+		.yaw = 0
+	};
+	rotation_vec3 tip_data = (rotation_vec3) {
+		.roll = 0,
+		.pitch = 0,
+		.yaw = 0
+	};
+
+
+	*finger_sensor_data = (FingerSensorData) {
+			.base = base_data,
+			.tip = tip_data
+	};
 }

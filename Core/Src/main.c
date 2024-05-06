@@ -83,11 +83,12 @@ static void MX_RF_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
+Hand hand;
 Finger finger;
-vec3 stub_hand_basis[3];
+vec3 hand_basis[3];
 rotation_vec3 rotation_data;
-rotation_vec3 hand_rotation_data;
-FingerSensorData finger_sensor_data;
+rotation_vec3 hand_sensor_data;
+FingerSensorData finger_sensor_data[4];
 
 /* USER CODE END 0 */
 
@@ -149,20 +150,20 @@ int main(void)
 	uint8_t flag;
 
 /* Implementation of the sensor read/write function cannot really be changed so here we go*/
-	dev.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
-	dev.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
+	dev.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read1;
+	dev.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write1;
 	Init_BMI323(&dev);
 	HAL_Delay(10);
 
-	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read4;
-	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write4;
+	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
+	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
 	Init_BMI323(&dev2);
 	HAL_Delay(10);
 
-//	dev3.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
-//	dev3.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
-//	Init_BMI323(&dev3);
-//	HAL_Delay(10);
+	dev3.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
+	dev3.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
+	Init_BMI323(&dev3);
+	HAL_Delay(10);
 //
 //	dev4.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read4;
 //	dev4.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write4;
@@ -204,13 +205,14 @@ int main(void)
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
 //  PDEBUG("Initialize hand\n");
-  InitializeHand(&finger, stub_hand_basis, &rotation_data, &rotation_data, &finger_sensor_data);
-  int frequency = 10;
-  float data1[] = {0,0,0,0,0,0};
-  float data2[] = {0,0,0,0,0,0};
+  initialize_hand(&hand, &hand_sensor_data, finger_sensor_data);
+//  initialize_finger(&finger, hand_basis, &finger_sensor_data);
+//  int frequency = 10;
+//  float data1[] = {0,0,0,0,0,0};
+//  float data2[] = {0,0,0,0,0,0};
 //  float data3[] = {0,0,0,0,0,0};
-  uint16_t dataI1[] = {0,0,0,0,0,0};
-  uint16_t dataI2[] = {0,0,0,0,0,0};
+//  uint16_t dataI1[] = {0,0,0,0,0,0};
+//  uint16_t dataI2[] = {0,0,0,0,0,0};
 //  uint16_t dataI3[] = {0,0,0,0,0,0};
   while (1)
   {
