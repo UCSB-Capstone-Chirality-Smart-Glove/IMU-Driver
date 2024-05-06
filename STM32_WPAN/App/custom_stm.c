@@ -65,7 +65,7 @@ typedef struct{
 
 /* Private variables ---------------------------------------------------------*/
 uint8_t SizeF1 = 14;
-uint8_t SizeF2 = 12;
+uint8_t SizeF2 = 13;
 
 /**
  * START of Section BLE_DRIVER_CONTEXT

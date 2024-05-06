@@ -77,7 +77,7 @@ uint8_t NotifyCharData[247];
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
 uint8_t fingerPacket[14];
-uint8_t handPacket[12];
+uint8_t handPacket[13];
 uint8_t UpdateCharData2[4];
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
@@ -274,7 +274,7 @@ void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1
 }
 
 void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVectorY,
-                        uint16_t basisVectorZ, uint8_t flexSensorPalm, uint8_t flexSensorThumbWeb) {
+                        uint16_t basisVectorZ, uint8_t flexSensorPalm, uint8_t flexSensorThumbWeb, uint8_t moreData) {
     buffer[0] = (basisVectorX >> 8) & 0xFF;
     buffer[1] = basisVectorX & 0xFF;
     buffer[2] = (basisVectorY >> 8) & 0xFF;
@@ -283,6 +283,7 @@ void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVe
     buffer[5] = basisVectorZ & 0xFF;
     buffer[6] = flexSensorPalm;
     buffer[7] = flexSensorThumbWeb;
+    buffer[8] = moreData;
 }
 /* USER CODE END PFP */
 
