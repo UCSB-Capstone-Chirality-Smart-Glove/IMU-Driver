@@ -87,7 +87,7 @@ Hand hand;
 Finger finger;
 vec3 hand_basis[3];
 rotation_vec3 rotation_data;
-rotation_vec3 hand_rotation_data;
+rotation_vec3 hand_sensor_data;
 FingerSensorData finger_sensor_data[4];
 
 /* USER CODE END 0 */
@@ -205,7 +205,7 @@ int main(void)
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
 //  PDEBUG("Initialize hand\n");
-  initialize_hand(&hand, &hand_rotation_data, finger_sensor_data);
+  initialize_hand(&hand, &hand_sensor_data, finger_sensor_data);
 //  initialize_finger(&finger, hand_basis, &finger_sensor_data);
 //  int frequency = 10;
 //  float data1[] = {0,0,0,0,0,0};

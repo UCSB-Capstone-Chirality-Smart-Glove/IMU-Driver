@@ -3,13 +3,21 @@
 
 
 float get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency) {
-    return (hand_data.roll - base_data.roll)/frequency;
+	float gyro_bend = (hand_data.roll - base_data.roll)/frequency;
+	float difference_ratio = (hand_data.roll - base_data.roll)/((hand_data.roll + base_data.roll)/2);
+	PDEBUG("hand data roll: %d\n", (int)hand_data.roll);
+	PDEBUG("base data roll: %d\n", (int)base_data.roll);
+	PDEBUG("gyro bend change: %d\n", (int)gyro_bend);
+    if (difference_ratio < 0.025) return gyro_bend;
+    return 0;
 }
 
 float get_curl(FingerSensorData* finger_data, int16_t frequency) {
+	float gyro_curl = (finger_data->base.roll - finger_data->tip.roll)/frequency;
 	PDEBUG("base roll: %d\n", (int)finger_data->base.roll);
 	PDEBUG("tip roll: %d\n", (int)finger_data->tip.roll);
-    return (finger_data->base.roll - finger_data->tip.roll)/frequency;
+	PDEBUG("gyro curl change: %d\n", (int)gyro_curl);
+    return gyro_curl;
 }
 
 void calibrate_finger(Finger* finger) {
@@ -30,8 +38,9 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 
 	// update bend
     float bend_change = get_bend(*hand_data, finger_data->base, frequency);
-    finger->bend += bend_change * adjustment;
+    if (bend_change < 150) finger->bend += bend_change;
     finger->bend = fmod(finger->bend, 360);
+	PDEBUG("gyro bend: %d\n", (int)finger->bend);
 
     // update curl
     float curl_change = get_curl(finger_data, frequency);

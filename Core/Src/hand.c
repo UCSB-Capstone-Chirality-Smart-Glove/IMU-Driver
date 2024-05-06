@@ -7,7 +7,11 @@ void calibrate_hand_basis(Hand* hand) {
 }
 
 void update_hand(Hand* hand, rotation_vec3* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]) {
-    for (int i = 0; i < 4; i++) {
+	rotation_vec3 stub = (rotation_vec3) {0, 0, 0};
+	PDEBUG("hand Roll: %d\n", (int)hand_rotation->roll);
+	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->pitch);
+	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->yaw);
+    for (int i = 0; i < 1; i++) {
         // apply finger rotation to fingers
         update_finger(hand->finger[i], &finger_data[i], frequency, hand_rotation);
     }

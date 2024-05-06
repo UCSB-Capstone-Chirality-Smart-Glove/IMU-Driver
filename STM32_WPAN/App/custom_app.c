@@ -109,8 +109,9 @@ extern Finger finger;
 extern Hand hand;
 extern vec3 hand_basis[3];
 extern rotation_vec3 rotation_data;
-extern rotation_vec3 hand_rotation_data;
+extern rotation_vec3 hand_sensor_data;
 extern FingerSensorData finger_sensor_data[4];
+rotation_vec3 hand_rotation_data;
 const int ACTIVE_FINGERS = 1;
 
 const unsigned long CYCLES_PER_MS = 64000;
@@ -194,9 +195,9 @@ void myTask(void)
     	finger_sensor_data[0].tip.pitch = data2[1];
     	finger_sensor_data[0].tip.yaw = data2[2];
 
-    	hand_rotation_data.roll = data3[0];
-    	hand_rotation_data.pitch = data3[1];
-    	hand_rotation_data.yaw = data3[2];
+    	hand_sensor_data.roll = data3[0];
+    	hand_sensor_data.pitch = data3[1];
+    	hand_sensor_data.yaw = data3[2];
 
     	charValue2 = (int16_t)finger.bend;
     	charValue3 = (int16_t)finger.curl;
@@ -204,7 +205,7 @@ void myTask(void)
     	charValue5 = 0;
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
-    	update_hand(&hand, &hand_rotation_data, frequency, finger_sensor_data);
+    	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data);
     	hand_rotation_data = matrix_to_euler(hand.basis);
     	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
     	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
