@@ -93,13 +93,17 @@ float data1[] = {0,0,0,0,0,0};
 float data2[] = {0,0,0,0,0,0};
 float data3[] = {0,0,0,0,0,0};
 float data4[] = {0,0,0,0,0,0};
+float data5[] = {0,0,0,0,0,0};
+float data6[] = {0,0,0,0,0,0};
 
 uint16_t dataI1[] = {0,0,0,0,0,0};
 uint16_t dataI2[] = {0,0,0,0,0,0};
 uint16_t dataI3[] = {0,0,0,0,0,0};
 uint16_t dataI4[] = {0,0,0,0,0,0};
+uint16_t dataI5[] = {0,0,0,0,0,0};
+uint16_t dataI6[] = {0,0,0,0,0,0};
 
-extern struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
+extern struct bmi3_dev dev, dev2, dev3, dev4, dev5, dev6; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
 
 // Flex Sensor Data
 float flexData[] = {0,0,0,0};
@@ -173,11 +177,33 @@ void myTask(void)
     uint32_t currentTick = HAL_GetTick();
 
     if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
     	while((flag & 0x40) == 0) break;
+    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+		while((flag & 0x40) == 0) break;
+		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev3);
+		while((flag & 0x40) == 0) break;
+		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev4);
+		while((flag & 0x40) == 0) break;
+		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev5);
+		while((flag & 0x40) == 0) break;
+		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev6);
+		while((flag & 0x40) == 0) break;
     	read_sensor(dev, data1, dataI1);
     	read_sensor(dev2, data2, dataI2);
     	read_sensor(dev3, data3, dataI3);
+		read_sensor(dev4, data4, dataI4);
+		read_sensor(dev5, data5, dataI5);
+		read_sensor(dev6, data6, dataI6);
+//    	read_sensor(dev3, data3, dataI3);
+    	PDEBUG("1: X: %f, Y: %f, Z: %f\n\r", data1[0], data1[1], data1[2]);
+    	PDEBUG("2: X: %f, Y: %f, Z: %f\n\r", data2[0], data2[1], data2[2]);
+    	PDEBUG("3: X: %f, Y: %f, Z: %f\n\r", data3[0], data3[1], data3[2]);
+		PDEBUG("4: X: %f, Y: %f, Z: %f\n\r", data4[0], data4[1], data4[2]);
+		PDEBUG("5: X: %f, Y: %f, Z: %f\n\r", data5[0], data5[1], data5[2]);
+		PDEBUG("6: X: %f, Y: %f, Z: %f\n\r", data6[0], data6[1], data6[2]);
+    	HAL_Delay(500);
+
 
     	/* Flex Sensor data */
 //    	getFlexData(flexData);
@@ -187,31 +213,31 @@ void myTask(void)
 //    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
 //
 //    	}
-    	finger_sensor_data[0].base.roll = data1[0];
-    	finger_sensor_data[0].base.pitch = data1[1];
-    	finger_sensor_data[0].base.yaw = data1[2];
-
-    	finger_sensor_data[0].tip.roll = data2[0];
-    	finger_sensor_data[0].tip.pitch = data2[1];
-    	finger_sensor_data[0].tip.yaw = data2[2];
-
-    	hand_sensor_data.roll = data3[0];
-    	hand_sensor_data.pitch = data3[1];
-    	hand_sensor_data.yaw = data3[2];
-
-    	charValue2 = (int16_t)finger.bend;
-    	charValue3 = (int16_t)finger.curl;
-    	charValue4 = 0;
-    	charValue5 = 0;
+//    	finger_sensor_data[0].base.roll = data1[0];
+//    	finger_sensor_data[0].base.pitch = data1[1];
+//    	finger_sensor_data[0].base.yaw = data1[2];
+//
+//    	finger_sensor_data[0].tip.roll = data2[0];
+//    	finger_sensor_data[0].tip.pitch = data2[1];
+//    	finger_sensor_data[0].tip.yaw = data2[2];
+//
+//    	hand_sensor_data.roll = data3[0];
+//    	hand_sensor_data.pitch = data3[1];
+//    	hand_sensor_data.yaw = data3[2];
+//
+//    	charValue2 = (int16_t)finger.bend;
+//    	charValue3 = (int16_t)finger.curl;
+//    	charValue4 = 0;
+//    	charValue5 = 0;
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
-    	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data);
-    	hand_rotation_data = matrix_to_euler(hand.basis);
-    	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
-    	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
-    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
-    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
-    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
+//    	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data);
+//    	hand_rotation_data = matrix_to_euler(hand.basis);
+//    	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
+//    	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
+//    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
+//    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
+//    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
 
         if (UpdateCharData[0] == 180) {
