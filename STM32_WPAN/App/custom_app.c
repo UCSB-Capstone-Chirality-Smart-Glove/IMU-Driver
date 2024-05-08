@@ -187,13 +187,39 @@ void myTask(void)
 //    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
 //
 //    	}
-    	finger_sensor_data[0].base.roll = data1[0];
-    	finger_sensor_data[0].base.pitch = data1[1];
-    	finger_sensor_data[0].base.yaw = data1[2];
-
-    	finger_sensor_data[0].tip.roll = data2[0];
-    	finger_sensor_data[0].tip.pitch = data2[1];
-    	finger_sensor_data[0].tip.yaw = data2[2];
+    	finger_sensor_data[0] = (FingerSensorData){
+    			.base = (IMUData){
+    				.gyro = (rotation_vec3) {
+    					.roll = data1[0],
+    					.pitch = data1[1],
+						.yaw = data1[2]
+    				},
+    				.accel = (vec3) {
+    					.x = data1[3],
+    					.y = data1[4],
+						.z = data1[5]
+    				}
+    			},
+				.tip = (IMUData) {
+    				.gyro = (rotation_vec3) {
+    					.roll = data2[0],
+    					.pitch = data2[1],
+						.yaw = data2[2]
+    				},
+    				.accel = (vec3) {
+    					.x = data1[3],
+    					.y = data1[4],
+						.z = data1[5]
+    				}
+    			}
+    	};
+//    	finger_sensor_data[0].base.roll = data1[0];
+//    	finger_sensor_data[0].base.pitch = data1[1];
+//    	finger_sensor_data[0].base.yaw = data1[2];
+//
+//    	finger_sensor_data[0].tip.roll = data2[0];
+//    	finger_sensor_data[0].tip.pitch = data2[1];
+//    	finger_sensor_data[0].tip.yaw = data2[2];
 
     	hand_sensor_data.roll = data3[0];
     	hand_sensor_data.pitch = data3[1];

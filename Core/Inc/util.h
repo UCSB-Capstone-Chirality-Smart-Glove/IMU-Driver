@@ -18,6 +18,11 @@ typedef struct {
     float x, y, z;
 } vec3;
 
+//structure to encapsulate full sensor data
+typedef struct {
+	rotation_vec3 gyro;
+	vec3 accel;
+} IMUData;
 // multiplies a 3x1 vector over a 3x3 matrix
 // - matrix: a 3-long array of vec3's
 // - vector: a vec3

@@ -21,14 +21,14 @@ typedef struct {
 
 // incoming finger IMU data
 typedef struct {
-    rotation_vec3 base;
-    rotation_vec3 tip;
+    IMUData base;
+    IMUData tip;
 } FingerSensorData;
 
 // Returns change in bend in degrees
 // - base: rotation_vec3 containing angular rate data
 // - tip: rotation_vec3 with angular rate data
-float get_bend(rotation_vec3 hand_data, rotation_vec3 base_data, int16_t frequency);
+float get_bend(IMUData* hand_data, IMUData* base_data, int16_t frequency);
 
 float get_curl(FingerSensorData* finger_data, int16_t frequency);
 
@@ -40,7 +40,7 @@ void calibrate_finger(Finger* finger);
 void generate_gyroscope_update_matrix(Finger* finger, FingerSensorData* finger_data, int16_t frequency, vec3 hand_basis[3], vec3 result[3]);
 
 // updates the bend and curl of the passed finger, using IMU data for the base and tip of the and the palm
-void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, rotation_vec3* hand_data);
+void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, IMUData* hand_data);
 
 typedef struct {
     Finger finger;

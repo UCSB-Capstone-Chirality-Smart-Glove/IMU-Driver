@@ -87,7 +87,7 @@ Hand hand;
 Finger finger;
 vec3 hand_basis[3];
 rotation_vec3 rotation_data;
-rotation_vec3 hand_sensor_data;
+IMUData hand_sensor_data;
 FingerSensorData finger_sensor_data[4];
 
 /* USER CODE END 0 */

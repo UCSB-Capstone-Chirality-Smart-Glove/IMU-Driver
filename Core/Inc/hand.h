@@ -25,11 +25,11 @@ void calibrate_hand_basis(Hand* hand);
 
 // use angular rate data from hand IMU to rotate basis vectors and update fingers
 // - finger_data: an array of FingerSensorDatas of size 4, corresponding to each finger
-void update_hand(Hand* hand, rotation_vec3* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]);
+void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]);
 
 // set data up to send via bluetooth
 HandSendData package_hand_data(Hand* hand);
 
-void initialize_hand(Hand* hand, rotation_vec3* hand_sensor_data, FingerSensorData finger_sensor_data[4]);
+void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData finger_sensor_data[4]);
 
 #endif
