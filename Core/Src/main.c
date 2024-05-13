@@ -206,14 +206,6 @@ int main(void)
 //	HAL_Delay(10);
 //  PDEBUG("Initialize hand\n");
   initialize_hand(&hand, &hand_sensor_data, finger_sensor_data);
-//  initialize_finger(&finger, hand_basis, &finger_sensor_data);
-//  int frequency = 10;
-//  float data1[] = {0,0,0,0,0,0};
-//  float data2[] = {0,0,0,0,0,0};
-//  float data3[] = {0,0,0,0,0,0};
-//  uint16_t dataI1[] = {0,0,0,0,0,0};
-//  uint16_t dataI2[] = {0,0,0,0,0,0};
-//  uint16_t dataI3[] = {0,0,0,0,0,0};
   while (1)
   {
     /* USER CODE END WHILE */

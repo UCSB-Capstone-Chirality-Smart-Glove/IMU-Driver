@@ -21,9 +21,6 @@ float get_curl(FingerSensorData* finger_data, int16_t frequency) {
 }
 
 void calibrate_finger(Finger* finger) {
-//    finger->basis[0] = (vec3) {1, 0, 0};
-//    finger->basis[1] = (vec3) {0, 1, 0};
-//    finger->basis[2] = (vec3) {0, 0, 1};
 	finger->bend = 0;
 	finger->curl = 0;
 }
@@ -54,9 +51,14 @@ void calibrate_thumb(Thumb* thumb) {
     thumb->web_angle = 0;
 }
 
-void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, rotation_vec3* hand_data) {
+void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data) {
     // could probably do some sensor fusion here to make the finger data more accurate
-    update_finger(&(thumb->finger), finger_data, frequency, hand_data);
+//    update_finger(&(thumb->finger), finger_data, frequency, hand_data);
+	// update bend (using palm flex sensor)
+
+	// update curl (with IMUs)
+
+	// update web angle (with flex sensor)
     thumb->web_angle += knuckle_rotation_change;
 }
 
