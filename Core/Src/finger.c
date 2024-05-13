@@ -51,20 +51,16 @@ float get_fusion_bendcurl(vec3 gravity_vector, float gyro_bendcurl, float accel_
 
 float get_bend(IMUData* hand_data, IMUData* base_data, int16_t frequency){
 	float gyro_bend = (hand_data->gyro.roll - base_data->gyro.roll)/frequency;
-	float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, base_data->accel);
 	float difference_ratio = (hand_data->gyro.roll - base_data->gyro.roll)/((hand_data->gyro.roll + base_data->gyro.roll)/2);
-	float weighted_bend = get_fusion_bendcurl(base_data->accel, gyro_bend, accel_bend);
 //	PDEBUG("hand data roll: %d\n", (int)hand_data.roll);
 //	PDEBUG("base data roll: %d\n", (int)base_data.roll);
 //	PDEBUG("gyro bend change: %d\n", (int)gyro_bend);
-    if (difference_ratio < 0.025) return weighted_bend;
+    if (difference_ratio < 0.025) return gyro_bend;
     return 0;
 }
 
 float get_curl(FingerSensorData* finger_data, int16_t frequency) {
 	float gyro_curl = (finger_data->base.gyro.roll - finger_data->tip.gyro.roll)/frequency;
-	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
-	float weighted_curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
 //	PDEBUG("base roll: %d\n", (int)finger_data->base.roll);
 //	PDEBUG("tip roll: %d\n", (int)finger_data->tip.roll);
 	PDEBUG("gyro curl change: %d\n", (int)gyro_curl);
@@ -87,14 +83,22 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 	// update bend
     float bend_change = get_bend(hand_data, &(finger_data->base), frequency);
     if (bend_change < 150) finger->bend += bend_change;
-    finger->bend = fmod(finger->bend, 360);
-	PDEBUG("gyro bend: %d\n", (int)finger->bend);
+    float gyro_bend = fmod(finger->bend, 360);
+	PDEBUG("gyro bend: %d\n", (int)finger_bend);
 
     // update curl
     float curl_change = get_curl(finger_data, frequency);
 	PDEBUG("Curl change: %d\n", (int)curl_change);
     if (fabs(curl_change) < 150) finger->curl += curl_change;
-    finger->curl = fmod(finger->curl, 360);
+    float gyro_curl = fmod(finger->curl, 360);
+
+
+	float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, base_data->accel);
+	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
+
+
+	finger->bend = get_fusion_bendcurl(base_data->accel, gyro_bend, accel_bend);
+	finger->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
 }
 
 void calibrate_thumb(Thumb* thumb) {
