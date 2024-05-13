@@ -205,6 +205,9 @@ int main(void)
 //	Init_BMI323(&dev);
 //	HAL_Delay(10);
 //  PDEBUG("Initialize hand\n");
+
+  // ignore init messages
+  HAL_Delay(1000);
   initialize_hand(&hand, &hand_sensor_data, finger_sensor_data);
   while (1)
   {
