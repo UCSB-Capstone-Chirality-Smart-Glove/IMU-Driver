@@ -11,6 +11,7 @@ typedef struct {
 //    vec3 basis[3];
     float bend;
     float curl;
+    float wag;
 } Finger;
 
 // describe a finger with the direction it's pointing in (using cartesian vectors, with hand basis), and bend (in degrees)

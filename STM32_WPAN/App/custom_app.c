@@ -71,14 +71,14 @@ static Custom_App_Context_t Custom_App_Context;
  * END of Section BLE_APP_CONTEXT
  */
 
-uint8_t UpdateCharData[247];
+uint8_t UpdateCharData[247]; // char 1
 uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
 uint8_t fingerPacket[14];
 uint8_t handPacket[13];
-uint8_t UpdateCharData2[4];
+uint8_t UpdateCharData2[13]; //char 2
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
 uint8_t UpdateCharData5[4];

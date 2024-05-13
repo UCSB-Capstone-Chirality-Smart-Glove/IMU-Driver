@@ -20,6 +20,12 @@ float get_curl(FingerSensorData* finger_data, int16_t frequency) {
     return gyro_curl;
 }
 
+float get_wag(IMUData* hand_data, FingerSensorData* finger_data, int16_t frequency) {
+	float avg_finger_gyro_yaw = (finger_data->base.gyro.yaw + finger_data->tip.gyro.yaw)/2;
+	float gyro_wag = (avg_finger_gyro_yaw - base_data->gyro.roll)/frequency;
+	return gyro_wag;
+}
+
 void calibrate_finger(Finger* finger) {
 	finger->bend = 0;
 	finger->curl = 0;
@@ -44,6 +50,9 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 	PDEBUG("Curl change: %d\n", (int)curl_change);
     if (fabs(curl_change) < 150) finger->curl += curl_change;
     finger->curl = fmod(finger->curl, 360);
+
+    // update wag
+    float wag_change = get_wag()
 }
 
 void calibrate_thumb(Thumb* thumb) {
@@ -67,7 +76,8 @@ void initialize_finger(Finger *finger,
 		) {
 	*finger = (Finger) {
 		.curl = 0,
-		.bend = 0
+		.bend = 0,
+		.wag = 0
 	};
 
 	IMUData base_data = {
