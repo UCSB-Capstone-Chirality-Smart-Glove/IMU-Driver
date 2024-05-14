@@ -52,7 +52,10 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
     finger->curl = fmod(finger->curl, 360);
 
     // update wag
-    float wag_change = get_wag()
+    float wag_change = get_wag(hand_data, finger_data, frequency);
+    if (fabs(curl_change) < 150) finger->wag += wag_change;
+    finger->wag = fmod(finger->wag, 360);
+
 }
 
 void calibrate_thumb(Finger* thumb) {
