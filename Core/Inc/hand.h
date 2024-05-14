@@ -8,7 +8,7 @@
 // fingers indexed 0-3 are the index, middle, ring and pinky fingers, respectively
 typedef struct {
     Finger* finger[4];
-    Thumb* thumb;
+    Finger* thumb;
     float web_angles[3];
     vec3 basis[3];
 } Hand;

@@ -55,12 +55,12 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
     float wag_change = get_wag()
 }
 
-void calibrate_thumb(Thumb* thumb) {
+void calibrate_thumb(Finger* thumb) {
     calibrate_finger(&(thumb->finger));
     thumb->web_angle = 0;
 }
 
-void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data) {
+void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data) {
     // could probably do some sensor fusion here to make the finger data more accurate
 //    update_finger(&(thumb->finger), finger_data, frequency, hand_data);
 	// update bend (using palm flex sensor)

@@ -43,16 +43,11 @@ void generate_gyroscope_update_matrix(Finger* finger, FingerSensorData* finger_d
 // updates the bend and curl of the passed finger, using IMU data for the base and tip of the and the palm
 void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t frequency, IMUData* hand_data);
 
-typedef struct {
-    Finger finger;
-    float web_angle;
-} Thumb;
-
 // Sets finger direction to vector [1, 0, 0], bend to 0, knuckle rotation to 0
-void calibrate_thumb(Thumb* thumb);
+void calibrate_thumb(Finger* thumb);
 
 // updates thumb by updating the finger portion of thumb and knuckle rotation separately
-void update_thumb(Thumb* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data);
+void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data);
 
 // need bend-resistance graph to implement this
 int16_t get_flex_angle(float voltage);
