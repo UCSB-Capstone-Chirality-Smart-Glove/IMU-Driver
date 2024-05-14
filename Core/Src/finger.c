@@ -42,17 +42,34 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 	// update bend
     float bend_change = get_bend(hand_data, &(finger_data->base), frequency);
     if (bend_change < 150) finger->bend += bend_change;
+<<<<<<< Updated upstream
     finger->bend = fmod(finger->bend, 360);
 	PDEBUG("gyro bend: %d\n", (int)finger->bend);
+=======
+    float gyro_bend = fmod(finger->bend, 360);
+	PDEBUG("gyro bend: %d\n", (int)gyro_bend);
+>>>>>>> Stashed changes
 
     // update curl
     float curl_change = get_curl(finger_data, frequency);
 	PDEBUG("Curl change: %d\n", (int)curl_change);
     if (fabs(curl_change) < 150) finger->curl += curl_change;
+<<<<<<< Updated upstream
     finger->curl = fmod(finger->curl, 360);
 
     // update wag
     float wag_change = get_wag()
+=======
+    float gyro_curl = fmod(finger->curl, 360);
+
+
+	float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, finger_data->base.accel);
+	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
+
+
+	finger->bend = get_fusion_bendcurl(finger_data->base.accel, gyro_bend, accel_bend);
+	finger->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
+>>>>>>> Stashed changes
 }
 
 void calibrate_thumb(Thumb* thumb) {
