@@ -127,14 +127,22 @@ float dot_vec3(vec3 v1, vec3 v2){
 }
 
 float magnitude(vec3 v){
-    return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+//	PDEBUG("in magnitude | x:%f\n", v.x);
+//	PDEBUG("in magnitude | y:%f\n", v.y);
+//	PDEBUG("in magnitude | z:%f\n", v.z);
+//	float m = sqrt(v->x*v->x + v->y*v->y + v->z*v->z);
+//	float m = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+//	PDEBUG("in magnitude | mag: %f\n", m);
+	float m = (float)sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    return m;
 }
 
 void L2_vec_norm(vec3* v){
     float x = v->x, y = v->y, z = v->z;
-    v->x /= sqrt(x*x + y*y + z*z);
-    v->y /= sqrt(x*x + y*y + z*z);
-    v->z /= sqrt((x*x + y*y + z*z));
+    float mag = sqrt(x*x + y*y + z*z);
+    v->x /= mag;
+    v->y /= mag;
+    v->z /= mag;
 }
 
 float LSB_to_degrees = angular_rate_max / INT16_MAX;

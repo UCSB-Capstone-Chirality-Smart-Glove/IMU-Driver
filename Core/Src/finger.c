@@ -4,8 +4,15 @@
 float accel_relative_rotation_from_gravity(vec3 lower_gravity_vector, vec3 upper_gravity_vector){
     L2_vec_norm(&lower_gravity_vector);
     L2_vec_norm(&upper_gravity_vector);
+//	PDEBUG("in accel_angle | x:%f\n", lower_gravity_vector.x);
+//	PDEBUG("in accel_angle | y:%f\n", lower_gravity_vector.y);
+//	PDEBUG("in accel_angle | z:%f\n", lower_gravity_vector.z);
     // # Step 3: Calculate Rotation Angle
-    return (180/M_PI)*((float)acos(dot_vec3(lower_gravity_vector, upper_gravity_vector)));
+	float mag = magnitude(lower_gravity_vector);
+//    PDEBUG("mag: %f\n", (float)mag);
+    float cos = dot_vec3(lower_gravity_vector, upper_gravity_vector);
+//    PDEBUG("cos: %f\n", cos);
+    return (180.0/M_PI)*((float)acos(cos));
 }
 
 /*
@@ -20,32 +27,24 @@ float get_fusion_bendcurl(vec3 gravity_vector, float gyro_bendcurl, float accel_
     * reading from both sensors to be equally weighted (0.5 each). Weights should always add up to 1.
     */
 
+	PDEBUG("magnitude: %f\n", magnitude(gravity_vector));
     // perform magnitude-based weighting
     float mag = magnitude(gravity_vector);
-    float R = (10*PEAK_CONST)/((mag-1)*(mag-1) + PEAK_CONST);
+    float R = (10*PEAK_CONST)/((mag-g)*(mag-g) + PEAK_CONST);
     float mag_gyro_weight = Q/(R+Q);
     float mag_accel_weight = R/(R+Q);
 
     // perform orientation-based weighting
     L2_vec_norm(&gravity_vector);
     float cos = gravity_vector.x; //weight is the cos of the angle between (1 if gravity aligned with x axis, 0 if orthogonal to x-axis)
-    float orthog_accel_weight = sqrt(1 - cos*cos); // get the sine of the angle cos^2 = 1 - sin^2 and (ignore rest for now)then scale by 0.5 to get a maximum of 0.5 (since gyroscope is more dependable here)
-
-    // float orthog_gyro_weight = 1 - 0.5*orthog_accel_weight;
-    // printf("ortho_gyro_weight: %f, ortho_accel_weight: %f\n", orthog_gyro_weight, 0.5*orthog_accel_weight);
-    // printf("mag_gyro_weight: %f, mag_accel_weight: %f\n", mag_gyro_weight, mag_accel_weight);
-
-    // float ortho_filtered = 0.5*orthog_accel_weight*accel_bendcurl + orthog_gyro_weight*gyro_bendcurl;
-    // float mag_filtered = mag_accel_weight*accel_bendcurl + mag_gyro_weight*gyro_bendcurl;
-    // printf("ortho_filtered: %f\n", ortho_filtered);
-    // printf("mag_filtered: %f\n", mag_filtered);
-    // printf("naive_avg_angle: %f\n", (mag_filtered+ortho_filtered)/2);
+    float orthog_accel_weight = sqrt(1 - cos*cos); // get the sine of the angle cos^2 = 1 - sin^2
+    PDEBUG("orthog_accel_weight: %f\n", orthog_accel_weight);
+    PDEBUG("mag_accel_weight: %f\n", mag_accel_weight);
 
     float accel_weight = orthog_accel_weight*mag_accel_weight;
     float gyro_weight = 1 - accel_weight;
+    PDEBUG("accel_weight: %f\n", accel_weight);
     float weighted_angle = gyro_weight*gyro_bendcurl + accel_weight*accel_bendcurl;
-    // printf("gyro_weight: %f, accel_weight: %f\n", gyro_weight, orthog_accel_weight*mag_accel_weight);
-
     return weighted_angle;//accel_weight*accel_bendcurl + gyro_weight*gyro_bendcurl;
 }
 
@@ -84,7 +83,7 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
     float bend_change = get_bend(hand_data, &(finger_data->base), frequency);
     if (bend_change < 150) finger->bend += bend_change;
     float gyro_bend = fmod(finger->bend, 360);
-	PDEBUG("gyro bend: %d\n", (int)finger_bend);
+	PDEBUG("gyro bend: %d\n", (int)gyro_bend);
 
     // update curl
     float curl_change = get_curl(finger_data, frequency);
@@ -92,12 +91,14 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
     if (fabs(curl_change) < 150) finger->curl += curl_change;
     float gyro_curl = fmod(finger->curl, 360);
 
-
-	float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, base_data->accel);
+    float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, finger_data->base.accel);
 	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
 
+	PDEBUG("accel_bend: %f\n", accel_bend);
+	PDEBUG("accel_curl: %f\n", accel_curl);
 
-	finger->bend = get_fusion_bendcurl(base_data->accel, gyro_bend, accel_bend);
+
+	finger->bend = get_fusion_bendcurl(finger_data->base.accel, gyro_bend, accel_bend);
 	finger->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
 }
 

@@ -7,13 +7,15 @@ void calibrate_hand_basis(Hand* hand) {
 }
 
 void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]) {
-	IMUData stub = (IMUData) {{0, 0, 0}, {0,0,0}};
 	PDEBUG("hand Roll: %d\n", (int)hand_rotation->gyro.roll);
 	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->gyro.pitch);
 	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
     for (int i = 0; i < 1; i++) {
         // apply finger rotation to fingers
-        update_finger(hand->finger[i], &finger_data[i], frequency, &stub);
+//    	PDEBUG("in update_hand | x:%f\n", finger_data[i].base.accel.x);
+//    	PDEBUG("in update hand | y:%f\n", finger_data[0].base.accel.y);
+//    	PDEBUG("in update hand | z:%f\n", finger_data[0].base.accel.z);
+        update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
     }
 
     // TODO: update web angles
