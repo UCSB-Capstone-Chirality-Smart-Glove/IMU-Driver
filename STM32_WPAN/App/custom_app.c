@@ -239,6 +239,8 @@ void myTask(void)
     	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
     	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
+    	populateFingerPacket(fingerPacket, hand.finger[0]->bend, hand.finger[0]->curl, 0, 0, 0, 0, 0, 0, 0, 0);
+    	populateHandPacket(handPacket, 0, 0, 0, 0, 0, 0);
 
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;
