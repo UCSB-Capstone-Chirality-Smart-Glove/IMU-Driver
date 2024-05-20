@@ -47,6 +47,12 @@ void average_matrices(vec3 **matrices, float *weights, int length, vec3 result[3
 
 rotation_vec3 matrix_to_euler(vec3 matrix[3]);
 
+float magnitude(vec3 v);
+
+void L2_vec_norm(vec3* v);
+
+float dot_vec3(vec3 v1, vec3 v2);
+
 // maximum angular rate of BMI323; set manually
 #define angular_rate_max 500.0
 

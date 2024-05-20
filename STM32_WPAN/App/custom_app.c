@@ -109,7 +109,7 @@ extern Finger finger;
 extern Hand hand;
 extern vec3 hand_basis[3];
 extern rotation_vec3 rotation_data;
-extern rotation_vec3 hand_sensor_data;
+extern IMUData hand_sensor_data;
 extern FingerSensorData finger_sensor_data[4];
 rotation_vec3 hand_rotation_data;
 const int ACTIVE_FINGERS = 1;
@@ -179,6 +179,7 @@ void myTask(void)
     	read_sensor(dev2, data2, dataI2);
     	read_sensor(dev3, data3, dataI3);
 
+
     	/* Flex Sensor data */
 //    	getFlexData(flexData);
 //    	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
@@ -207,12 +208,15 @@ void myTask(void)
 					.yaw = data2[2]
 				},
 				.accel = (vec3) {
-					.x = data1[3],
-					.y = data1[4],
-					.z = data1[5]
+					.x = data2[3],
+					.y = data2[4],
+					.z = data2[5]
 				}
 			}
     	};
+
+//    	PDEBUG("x:%f, y:%f, z:%f \n", finger_sensor_data[0].base.accel.x, finger_sensor_data[0].base.accel.y, finger_sensor_data[0].base.accel.z);
+
 //    	finger_sensor_data[0].base.roll = data1[0];
 //    	finger_sensor_data[0].base.pitch = data1[1];
 //    	finger_sensor_data[0].base.yaw = data1[2];
@@ -221,9 +225,13 @@ void myTask(void)
 //    	finger_sensor_data[0].tip.pitch = data2[1];
 //    	finger_sensor_data[0].tip.yaw = data2[2];
 
-    	hand_sensor_data.roll = data3[0];
-    	hand_sensor_data.pitch = data3[1];
-    	hand_sensor_data.yaw = data3[2];
+    	hand_sensor_data.gyro.roll = data3[0];
+    	hand_sensor_data.gyro.pitch = data3[1];
+    	hand_sensor_data.gyro.yaw = data3[2];
+
+    	hand_sensor_data.accel.x = data3[3];
+    	hand_sensor_data.accel.y = data3[4];
+    	hand_sensor_data.accel.z = data3[5];
 
     	charValue2 = (int16_t)finger.bend;
     	charValue3 = (int16_t)finger.curl;
@@ -231,6 +239,7 @@ void myTask(void)
     	charValue5 = 0;
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
+//    	PDEBUG("finger_sensor_data.x: %f\n", finger_sensor_data[0].base.accel.x);
     	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data);
     	hand_rotation_data = matrix_to_euler(hand.basis);
     	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);

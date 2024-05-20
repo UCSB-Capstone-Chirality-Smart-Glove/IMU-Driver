@@ -122,6 +122,29 @@ rotation_vec3 matrix_to_euler(vec3 matrix[3]) {
 	}
 }
 
+float dot_vec3(vec3 v1, vec3 v2){
+    return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
+}
+
+float magnitude(vec3 v){
+//	PDEBUG("in magnitude | x:%f\n", v.x);
+//	PDEBUG("in magnitude | y:%f\n", v.y);
+//	PDEBUG("in magnitude | z:%f\n", v.z);
+//	float m = sqrt(v->x*v->x + v->y*v->y + v->z*v->z);
+//	float m = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+//	PDEBUG("in magnitude | mag: %f\n", m);
+	float m = (float)sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    return m;
+}
+
+void L2_vec_norm(vec3* v){
+    float x = v->x, y = v->y, z = v->z;
+    float mag = sqrt(x*x + y*y + z*z);
+    v->x /= mag;
+    v->y /= mag;
+    v->z /= mag;
+}
+
 float LSB_to_degrees = angular_rate_max / INT16_MAX;
 
 int ANGLE_RESOLUTION = 1;
