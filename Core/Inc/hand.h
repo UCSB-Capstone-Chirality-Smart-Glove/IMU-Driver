@@ -16,7 +16,6 @@ typedef struct {
 // packaged hand data to send via bluetooth
 typedef struct {
     FingerSendData finger[4];
-    Thumb thumb;
     vec3 basis[3];
 } HandSendData;
 
