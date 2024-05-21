@@ -71,14 +71,14 @@ static Custom_App_Context_t Custom_App_Context;
  * END of Section BLE_APP_CONTEXT
  */
 
-uint8_t UpdateCharData[247]; // char 1
+uint8_t UpdateCharData[247];
 uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
 uint8_t fingerPacket[14];
 uint8_t handPacket[13];
-uint8_t UpdateCharData2[13]; //char 2
+uint8_t UpdateCharData2[12]; //Put Second Char data here, Put first finger packet info in UpdateCharData[]
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
 uint8_t UpdateCharData5[4];
@@ -313,7 +313,6 @@ void myTask(void)
         UpdateCharData3[0] = (charValue3 >> 8) & 0xFF;
         UpdateCharData3[1] = charValue3 & 0xFF;
 
-
         UpdateCharData4[0] = (charValue4 >> 8) & 0xFF;
         UpdateCharData4[1] = charValue4 & 0xFF;
 
@@ -376,18 +375,24 @@ void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1
     buffer[14] = thumbBend;
 }
 
-void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVectorY,
-                        uint16_t basisVectorZ, uint8_t flexSensorPalm, uint8_t flexSensorThumbWeb, uint8_t moreData) {
-    buffer[0] = (basisVectorX >> 8) & 0xFF;
-    buffer[1] = basisVectorX & 0xFF;
-    buffer[2] = (basisVectorY >> 8) & 0xFF;
-    buffer[3] = basisVectorY & 0xFF;
-    buffer[4] = (basisVectorZ >> 8) & 0xFF;
-    buffer[5] = basisVectorZ & 0xFF;
-    buffer[6] = flexSensorPalm;
-    buffer[7] = flexSensorThumbWeb;
-    buffer[8] = moreData;
+void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX,
+						uint16_t basisVectorY, uint16_t basisVectorZ, uint8_t flexSensorPalm,
+						uint8_t wag1, uint8_t wag2, uint8_t wag3,
+						uint8_t wag4, uint8_t wag5, uint8_t moreData) {
+	buffer[0] = (basisVectorX >> 8) & 0xFF;
+	buffer[1] = basisVectorX & 0xFF;
+	buffer[2] = (basisVectorY >> 8) & 0xFF;
+	buffer[3] = basisVectorY & 0xFF;
+	buffer[4] = (basisVectorZ >> 8) & 0xFF;
+	buffer[5] = basisVectorZ & 0xFF;
+	buffer[6] = flexSensorPalm;
+	buffer[7] = wag1;
+	buffer[8] = wag2;
+	buffer[9] = wag3;
+	buffer[10] = wag4;
+	buffer[11] = wag5;
 }
+
 /* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
@@ -509,7 +514,8 @@ void Custom_F1_Update_Char(void) /* Property Read */
   }
 
   /* USER CODE BEGIN F1_UC_Last*/
-
+  // Buffer Above is the one to be populated ______________^^^^^ this buffer
+  // Change after every update to IOC
   /* USER CODE END F1_UC_Last*/
   return;
 }
@@ -548,7 +554,8 @@ void Custom_F2_Update_Char(void) /* Property Read */
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
-
+  // Buffer Above is the one to be populated ______________^^^^^ this buffer
+  // Change after every update to IOC
   /* USER CODE END F2_UC_Last*/
   return;
 }
