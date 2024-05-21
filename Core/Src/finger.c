@@ -119,14 +119,22 @@ void calibrate_thumb(Finger* thumb) {
     calibrate_finger(thumb);
 }
 
-void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data) {
+void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t frequency, float flex_data[]) {
     // could probably do some sensor fusion here to make the finger data more accurate
-//    update_finger(&(thumb->finger), finger_data, frequency, hand_data);
+
 	// update bend (using palm flex sensor)
+	float palm_flex_bend = flex_data[0];
+	thumb->bend = palm_flex_bend;
 
 	// update curl (with IMUs)
+	float gyro_curl = get_curl(finger_data, frequency);
+	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
+	thumb->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
 
-	// update web angle (with flex sensor)
+	// update wag angle (with flex sensor)
+	float web_flex_wag = flex_data[1];
+	thumb->wag = web_flex_wag;
+
 //    thumb->web_angle += knuckle_rotation_change;
 }
 

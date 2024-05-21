@@ -50,8 +50,8 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 // Sets finger direction to vector [1, 0, 0], bend to 0, knuckle rotation to 0
 void calibrate_thumb(Finger* thumb);
 
-// updates thumb by updating the finger portion of thumb and knuckle rotation separately
-void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t knuckle_rotation_change, int16_t frequency, IMUData* hand_data);
+// updates thumb by updating curl with IMU data, bend and wag with flex sensor data
+void update_thumb(Finger* thumb, FingerSensorData* finger_data, int16_t frequency, float flex_data[]);
 
 // need bend-resistance graph to implement this
 int16_t get_flex_angle(float voltage);

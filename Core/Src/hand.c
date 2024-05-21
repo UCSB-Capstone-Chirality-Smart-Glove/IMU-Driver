@@ -6,7 +6,7 @@ void calibrate_hand_basis(Hand* hand) {
     hand->basis[2] = (vec3) {0, 0, 1};
 }
 
-void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSensorData finger_data[4]) {
+void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSensorData finger_data[5], float flex_data[]) {
 	PDEBUG("hand Roll: %d\n", (int)hand_rotation->gyro.roll);
 	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->gyro.pitch);
 	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
@@ -17,10 +17,8 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
 //    	PDEBUG("in update hand | z:%f\n", finger_data[0].base.accel.z);
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
     }
-
-    // TODO: update web angles
-
     // TODO: update thumb
+    update_thumb(hand->thumb, &(finger_data[4]), frequency, flex_data);
 
     // update hand basis
     vec3 gyro_rotation_matrix[3];
