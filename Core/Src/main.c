@@ -82,7 +82,7 @@ static void MX_RF_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
+struct bmi3_dev dev[11];
 Hand hand;
 Finger finger;
 vec3 hand_basis[3];
@@ -150,61 +150,60 @@ int main(void)
 	uint8_t flag;
 
 /* Implementation of the sensor read/write function cannot really be changed so here we go*/
-	dev.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read1;
-	dev.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write1;
-	Init_BMI323(&dev);
+	dev[0].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read1;
+	dev[0].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write1;
+	Init_BMI323(&dev[0]);
 	HAL_Delay(10);
 
-	dev2.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
-	dev2.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
-	Init_BMI323(&dev2);
+	dev[1].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read2;
+	dev[1].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write2;
+	Init_BMI323(&dev[1]);
 	HAL_Delay(10);
 
-	dev3.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
-	dev3.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
-	Init_BMI323(&dev3);
+	dev[2].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read3;
+	dev[2].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write3;
+	Init_BMI323(&dev[2]);
 	HAL_Delay(10);
-//
-//	dev4.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read4;
-//	dev4.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write4;
-//	Init_BMI323(&dev4);
-//	HAL_Delay(10);
 
-//	dev5.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read5;
-//	dev5.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write5;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev6.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read6;
-//	dev6.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write6;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev7.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read7;
-//	dev7.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write7;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev8.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read8;
-//	dev8.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write8;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev9.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read9;
-//	dev9.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write9;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev10.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read10;
-//	dev10.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write10;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//
-//	dev11.read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read11;
-//	dev11.write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write11;
-//	Init_BMI323(&dev);
-//	HAL_Delay(10);
-//  PDEBUG("Initialize hand\n");
+	dev[3].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read4;
+	dev[3].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write4;
+	Init_BMI323(&dev[3]);
+	HAL_Delay(10);
+
+	dev[4].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read5;
+	dev[4].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write5;
+	Init_BMI323(&dev[4]);
+	HAL_Delay(10);
+
+	dev[5].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read6;
+	dev[5].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write6;
+	Init_BMI323(&dev[5]);
+	HAL_Delay(10);
+
+	dev[6].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read7;
+	dev[6].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write7;
+	Init_BMI323(&dev[6]);
+	HAL_Delay(10);
+
+	dev[7].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read8;
+	dev[7].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write8;
+	Init_BMI323(&dev[7]);
+	HAL_Delay(10);
+
+	dev[8].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read9;
+	dev[8].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write9;
+	Init_BMI323(&dev[8]);
+	HAL_Delay(10);
+
+	dev[9].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read10;
+	dev[9].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write10;
+	Init_BMI323(&dev[9]);
+	HAL_Delay(10);
+
+	dev[10].read = (bmi3_read_fptr_t)SensorAPI_SPIx_Read11;
+	dev[10].write = (bmi3_write_fptr_t)SensorAPI_SPIx_Write11;
+	Init_BMI323(&dev[10]);
+	HAL_Delay(10);
 
   // ignore init messages
   HAL_Delay(1000);

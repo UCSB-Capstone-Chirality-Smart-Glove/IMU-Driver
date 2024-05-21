@@ -93,13 +93,27 @@ float data1[] = {0,0,0,0,0,0};
 float data2[] = {0,0,0,0,0,0};
 float data3[] = {0,0,0,0,0,0};
 float data4[] = {0,0,0,0,0,0};
+float data5[] = {0,0,0,0,0,0};
+float data6[] = {0,0,0,0,0,0};
+float data7[] = {0,0,0,0,0,0};
+float data8[] = {0,0,0,0,0,0};
+float data9[] = {0,0,0,0,0,0};
+float data10[] = {0,0,0,0,0,0};
+float data11[] = {0,0,0,0,0,0};
 
 uint16_t dataI1[] = {0,0,0,0,0,0};
 uint16_t dataI2[] = {0,0,0,0,0,0};
 uint16_t dataI3[] = {0,0,0,0,0,0};
 uint16_t dataI4[] = {0,0,0,0,0,0};
+uint16_t dataI5[] = {0,0,0,0,0,0};
+uint16_t dataI6[] = {0,0,0,0,0,0};
+uint16_t dataI7[] = {0,0,0,0,0,0};
+uint16_t dataI8[] = {0,0,0,0,0,0};
+uint16_t dataI9[] = {0,0,0,0,0,0};
+uint16_t dataI10[] = {0,0,0,0,0,0};
+uint16_t dataI11[] = {0,0,0,0,0,0};
 
-extern struct bmi3_dev dev, dev2, dev3, dev4; // dev5, dev6, dev7, dev8, dev9, dev10, dev11;
+extern struct bmi3_dev dev[11];
 
 // Flex Sensor Data
 float flexData[] = {0,0,0,0};
@@ -141,18 +155,50 @@ void myTask(void)
 	//	PDEBUG("ADC: %f ", raw1);
 
 	/* IMU grab data */
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev);
-//	while((flag & 0x40) == 0) break;
-//	read_sensor(dev, data1, dataI1);
+//    bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[0]);
+//   	while((flag & 0x40) == 0) break;
+//   	read_sensor(dev[0], data1, dataI1);
+
+//    bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[1]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[1], data2, dataI2);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[2]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[2], data3, dataI3);
 //
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev3);
-//	while((flag & 0x40) == 0) break;
-//	read_sensor(dev3, data3, dataI3);
-//
-//	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev4);
-//	while((flag & 0x40) == 0) break;
-//	read_sensor(dev4, data4, dataI4);
-//	HAL_Delay(10);
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[3]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[3], data4, dataI4);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[4]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[4], data5, dataI5);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[5]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[5], data6, dataI6);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[6]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[6], data7, dataI7);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[7]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[7], data8, dataI8);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[8]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[8], data9, dataI9);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[9]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[9], data10, dataI10);
+
+// 		bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[10]);
+// 		while((flag & 0x40) == 0) break;
+// 		read_sensor(dev[10], data11, dataI11);
+//	  HAL_Delay(10);
 
 	/* BLE transfer */
 //	rotation_vec3 angles = matrix_to_euler(finger.basis);
@@ -173,11 +219,11 @@ void myTask(void)
     uint32_t currentTick = HAL_GetTick();
 
     if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
-    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev2);
+    	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[3]);
     	while((flag & 0x40) == 0) break;
-    	read_sensor(dev, data1, dataI1);
-    	read_sensor(dev2, data2, dataI2);
-    	read_sensor(dev3, data3, dataI3);
+    	read_sensor(dev[0], data1, dataI1);
+    	read_sensor(dev[1], data2, dataI2);
+    	read_sensor(dev[2], data3, dataI3);
 
 
     	/* Flex Sensor data */
