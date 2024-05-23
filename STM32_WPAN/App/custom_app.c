@@ -589,7 +589,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData2);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
