@@ -10,7 +10,7 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
 	PDEBUG("hand Roll: %d\n", (int)hand_rotation->gyro.roll);
 	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->gyro.pitch);
 	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 4; i++) {
         // apply finger rotation to fingers
 //    	PDEBUG("in update_hand | x:%f\n", finger_data[i].base.accel.x);
 //    	PDEBUG("in update hand | y:%f\n", finger_data[0].base.accel.y);

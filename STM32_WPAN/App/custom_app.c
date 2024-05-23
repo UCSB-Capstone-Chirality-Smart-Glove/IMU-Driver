@@ -100,6 +100,7 @@ float data8[] = {0,0,0,0,0,0};
 float data9[] = {0,0,0,0,0,0};
 float data10[] = {0,0,0,0,0,0};
 float data11[] = {0,0,0,0,0,0};
+float data[11][6];
 
 uint16_t dataI1[] = {0,0,0,0,0,0};
 uint16_t dataI2[] = {0,0,0,0,0,0};
@@ -112,6 +113,7 @@ uint16_t dataI8[] = {0,0,0,0,0,0};
 uint16_t dataI9[] = {0,0,0,0,0,0};
 uint16_t dataI10[] = {0,0,0,0,0,0};
 uint16_t dataI11[] = {0,0,0,0,0,0};
+uint16_t dataI[11][6];
 
 extern struct bmi3_dev dev[11];
 
@@ -221,9 +223,12 @@ void myTask(void)
     if (currentTick - lastNotificationTime >= NOTIFICATION_INTERVAL_MS) {
     	bmi3_get_regs(BMI3_REG_STATUS, &flag, 1, &dev[3]);
     	while((flag & 0x40) == 0) break;
-    	read_sensor(dev[0], data1, dataI1);
-    	read_sensor(dev[1], data2, dataI2);
-    	read_sensor(dev[2], data3, dataI3);
+//    	read_sensor(dev[0], data1, dataI1);
+//    	read_sensor(dev[1], data2, dataI2);
+//    	read_sensor(dev[2], data3, dataI3);
+    	for (int i = 0; i < 11; i++) {
+    		read_sensor(dev[i], data[i], dataI[i]);
+    	}
 
 
     	/* Flex Sensor data */
@@ -231,35 +236,61 @@ void myTask(void)
 //    	PDEBUG("A0: %f, A1: %f, A2: %f, A3: %f\r\n", flexData[0], flexData[1], flexData[2], flexData[3]);
 //    	HAL_Delay(100);
 
-//    	for (int i = 0; i < ACTIVE_FINGERS; i++) {
-//
-//    	}
-    	finger_sensor_data[0] = (FingerSensorData){
-			.base = (IMUData){
-				.gyro = (rotation_vec3) {
-					.roll = data1[0],
-					.pitch = data1[1],
-					.yaw = data1[2]
-				},
-				.accel = (vec3) {
-					.x = data1[3],
-					.y = data1[4],
-					.z = data1[5]
-				}
-			},
-			.tip = (IMUData) {
-				.gyro = (rotation_vec3) {
-					.roll = data2[0],
-					.pitch = data2[1],
-					.yaw = data2[2]
-				},
-				.accel = (vec3) {
-					.x = data2[3],
-					.y = data2[4],
-					.z = data2[5]
-				}
-			}
-    	};
+    	for (int i = 0; i < 10; i+=2) {
+        	finger_sensor_data[0] = (FingerSensorData){
+    			.base = (IMUData){
+    				.gyro = (rotation_vec3) {
+    					.roll = data[i][0],
+    					.pitch = data[i][1],
+    					.yaw = data[i][2]
+    				},
+    				.accel = (vec3) {
+    					.x = data[i][3],
+    					.y = data[i][4],
+    					.z = data[i][5]
+    				}
+    			},
+    			.tip = (IMUData) {
+    				.gyro = (rotation_vec3) {
+    					.roll = data[i+1][0],
+    					.pitch = data[i+1][1],
+    					.yaw = data[i+1][2]
+    				},
+    				.accel = (vec3) {
+    					.x = data[i+1][3],
+    					.y = data[i+1][4],
+    					.z = data[i+1][5]
+    				}
+    			}
+        	};
+    	}
+
+//    	finger_sensor_data[0] = (FingerSensorData){
+//			.base = (IMUData){
+//				.gyro = (rotation_vec3) {
+//					.roll = data1[0],
+//					.pitch = data1[1],
+//					.yaw = data1[2]
+//				},
+//				.accel = (vec3) {
+//					.x = data1[3],
+//					.y = data1[4],
+//					.z = data1[5]
+//				}
+//			},
+//			.tip = (IMUData) {
+//				.gyro = (rotation_vec3) {
+//					.roll = data2[0],
+//					.pitch = data2[1],
+//					.yaw = data2[2]
+//				},
+//				.accel = (vec3) {
+//					.x = data2[3],
+//					.y = data2[4],
+//					.z = data2[5]
+//				}
+//			}
+//    	};
 
 //    	PDEBUG("x:%f, y:%f, z:%f \n", finger_sensor_data[0].base.accel.x, finger_sensor_data[0].base.accel.y, finger_sensor_data[0].base.accel.z);
 
@@ -271,13 +302,13 @@ void myTask(void)
 //    	finger_sensor_data[0].tip.pitch = data2[1];
 //    	finger_sensor_data[0].tip.yaw = data2[2];
 
-    	hand_sensor_data.gyro.roll = data3[0];
-    	hand_sensor_data.gyro.pitch = data3[1];
-    	hand_sensor_data.gyro.yaw = data3[2];
+    	hand_sensor_data.gyro.roll = data[10][0];
+    	hand_sensor_data.gyro.pitch = data[10][1];
+    	hand_sensor_data.gyro.yaw = data[10][2];
 
-    	hand_sensor_data.accel.x = data3[3];
-    	hand_sensor_data.accel.y = data3[4];
-    	hand_sensor_data.accel.z = data3[5];
+    	hand_sensor_data.accel.x = data[10][3];
+    	hand_sensor_data.accel.y = data[10][4];
+    	hand_sensor_data.accel.z = data[10][5];
 
     	charValue2 = (int16_t)finger.bend;
     	charValue3 = (int16_t)finger.curl;
@@ -294,8 +325,16 @@ void myTask(void)
     	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
     	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
-    	populateFingerPacket(fingerPacket, hand.finger[0]->bend, hand.finger[0]->curl, 0, 0, 0, 0, 0, 0, 0, 0);
-    	populateHandPacket(handPacket, 0, 0, 0, 0, 0, 0);
+    	populateFingerPacket(fingerPacket,
+    			hand.finger[0]->curl, hand.finger[0]->bend,
+				hand.finger[1]->curl, hand.finger[1]->bend,
+				hand.finger[2]->curl, hand.finger[2]->bend,
+				hand.finger[3]->curl, hand.finger[3]->bend,
+				hand.finger[4]->curl, hand.finger[4]->bend);
+    	populateHandPacket(handPacket, 0, 0, 0, 0,
+    			hand.finger[0]->wag, hand.finger[1]->wag,
+				hand.finger[2]->wag, hand.finger[3]->wag,
+				hand.finger[4]->wag, 0);
 
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;
