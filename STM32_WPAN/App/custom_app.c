@@ -295,7 +295,7 @@ void myTask(void)
     	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
     	populateFingerPacket(fingerPacket, hand.finger[0]->bend, hand.finger[0]->curl, 0, 0, 0, 0, 0, 0, 0, 0);
-    	populateHandPacket(handPacket, 0, 0, 0, 0, 0, 0);
+    	populateHandPacket(handPacket, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;
@@ -550,7 +550,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData2);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
