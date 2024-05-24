@@ -16,6 +16,10 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
 //    	PDEBUG("in update hand | y:%f\n", finger_data[0].base.accel.y);
 //    	PDEBUG("in update hand | z:%f\n", finger_data[0].base.accel.z);
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
+        	PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
+        	PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
+        	PDEBUG("Finger %d wag: %d\n", i, (int)hand->finger[i]->wag);
+
     }
     // TODO: update thumb
     update_thumb(hand->thumb, &(finger_data[4]), frequency, flex_data);
