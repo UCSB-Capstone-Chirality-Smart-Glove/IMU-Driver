@@ -52,7 +52,7 @@ typedef struct
 
 /* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOTIFICATION_INTERVAL_MS 100
+#define NOTIFICATION_INTERVAL_MS 150
 /* USER CODE END PD */
 
 /* Private macros -------------------------------------------------------------*/
@@ -237,7 +237,7 @@ void myTask(void)
 //    	HAL_Delay(100);
 
     	for (int i = 0; i < 10; i+=2) {
-        	finger_sensor_data[0] = (FingerSensorData){
+        	finger_sensor_data[i/2] = (FingerSensorData){
     			.base = (IMUData){
     				.gyro = (rotation_vec3) {
     					.roll = data[i][0],
@@ -264,43 +264,6 @@ void myTask(void)
     			}
         	};
     	}
-
-//    	finger_sensor_data[0] = (FingerSensorData){
-//			.base = (IMUData){
-//				.gyro = (rotation_vec3) {
-//					.roll = data1[0],
-//					.pitch = data1[1],
-//					.yaw = data1[2]
-//				},
-//				.accel = (vec3) {
-//					.x = data1[3],
-//					.y = data1[4],
-//					.z = data1[5]
-//				}
-//			},
-//			.tip = (IMUData) {
-//				.gyro = (rotation_vec3) {
-//					.roll = data2[0],
-//					.pitch = data2[1],
-//					.yaw = data2[2]
-//				},
-//				.accel = (vec3) {
-//					.x = data2[3],
-//					.y = data2[4],
-//					.z = data2[5]
-//				}
-//			}
-//    	};
-
-//    	PDEBUG("x:%f, y:%f, z:%f \n", finger_sensor_data[0].base.accel.x, finger_sensor_data[0].base.accel.y, finger_sensor_data[0].base.accel.z);
-
-//    	finger_sensor_data[0].base.roll = data1[0];
-//    	finger_sensor_data[0].base.pitch = data1[1];
-//    	finger_sensor_data[0].base.yaw = data1[2];
-//
-//    	finger_sensor_data[0].tip.roll = data2[0];
-//    	finger_sensor_data[0].tip.pitch = data2[1];
-//    	finger_sensor_data[0].tip.yaw = data2[2];
 
     	hand_sensor_data.gyro.roll = data[10][0];
     	hand_sensor_data.gyro.pitch = data[10][1];
@@ -549,7 +512,7 @@ void Custom_F1_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)UpdateCharData);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F1, (uint8_t *)fingerPacket);
   }
 
   /* USER CODE BEGIN F1_UC_Last*/
@@ -589,7 +552,7 @@ void Custom_F2_Update_Char(void) /* Property Read */
 
   if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)UpdateCharData);
+    Custom_STM_App_Update_Char(CUSTOM_STM_F2, (uint8_t *)handPacket);
   }
 
   /* USER CODE BEGIN F2_UC_Last*/
