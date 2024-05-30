@@ -208,6 +208,10 @@ int main(void)
   // ignore init messages
   HAL_Delay(1000);
   initialize_hand(&hand, &hand_sensor_data, finger_sensor_data);
+  // init adc
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_PollForConversion(&hadc1, 10);
+
   while (1)
   {
     /* USER CODE END WHILE */

@@ -34,29 +34,53 @@ uint8_t GTXBuffer[512], GRXBuffer[2048];
 //#define port11 GPIOB
 //#define pin11 GPIO_PIN_4 // thumb tip
 
+// hand mach 1
+//#define port1 GPIOA
+//#define pin1 GPIO_PIN_4 // index base
+//#define port2 GPIOA
+//#define pin2 GPIO_PIN_3 // index tip
+//#define port3 GPIOA
+//#define pin3 GPIO_PIN_1 // middle base
+//#define port4 GPIOA
+//#define pin4 GPIO_PIN_0 // middle tip
+//#define port5 GPIOC
+//#define pin5 GPIO_PIN_6 // ring base
+//#define port6 GPIOB
+//#define pin6 GPIO_PIN_13 // ring tip
+//#define port7 GPIOB
+//#define pin7 GPIO_PIN_15 // pinky base
+//#define port8 GPIOB
+//#define pin8 GPIO_PIN_14 // pinky tip
+//#define port9 GPIOA
+//#define pin9 GPIO_PIN_9 // thumb base
+//#define port10 GPIOB
+//#define pin10 GPIO_PIN_4 // thumb tip
+//#define port11 GPIOA
+//#define pin11 GPIO_PIN_2 // palm
+
+// hand mach 2
 #define port1 GPIOA
 #define pin1 GPIO_PIN_4 // index base
-#define port2 GPIOA
-#define pin2 GPIO_PIN_3 // index tip
+#define port2 GPIOB
+#define pin2 GPIO_PIN_14 // index tip
 #define port3 GPIOA
 #define pin3 GPIO_PIN_1 // middle base
 #define port4 GPIOA
 #define pin4 GPIO_PIN_0 // middle tip
-#define port5 GPIOC
-#define pin5 GPIO_PIN_6 // ring base
-#define port6 GPIOB
-#define pin6 GPIO_PIN_13 // ring tip
+#define port5 GPIOA
+#define pin5 GPIO_PIN_2 // ring base
+#define port6 GPIOA
+#define pin6 GPIO_PIN_3 // ring tip
 #define port7 GPIOB
-#define pin7 GPIO_PIN_15 // pinky base
-#define port8 GPIOB
-#define pin8 GPIO_PIN_14 // pinky tip
-#define port9 GPIOA
-#define pin9 GPIO_PIN_9 // thumb base
+#define pin7 GPIO_PIN_4 // pinky base
+#define port8 GPIOA
+#define pin8 GPIO_PIN_9 // pinky tip
+#define port9 GPIOC
+#define pin9 GPIO_PIN_6 // thumb base
 #define port10 GPIOB
-#define pin10 GPIO_PIN_4 // thumb tip
-#define port11 GPIOA
-#define pin11 GPIO_PIN_2 // palm
-
+#define pin10 GPIO_PIN_13 // thumb tip
+#define port11 GPIOB
+#define pin11 GPIO_PIN_15 // palm
 
 int8_t SensorAPI_SPIx_Read1(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void *intf_ptr)
 {

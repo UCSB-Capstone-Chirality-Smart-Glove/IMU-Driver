@@ -16,13 +16,16 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
 //    	PDEBUG("in update hand | y:%f\n", finger_data[0].base.accel.y);
 //    	PDEBUG("in update hand | z:%f\n", finger_data[0].base.accel.z);
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
-        	PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
-        	PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
-        	PDEBUG("Finger %d wag: %d\n", i, (int)hand->finger[i]->wag);
-
+		PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
+		PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
+		PDEBUG("Finger %d wag: %d\n", i, (int)hand->finger[i]->wag);
     }
     // TODO: update thumb
-    update_thumb(hand->thumb, &(finger_data[4]), frequency, flex_data);
+    update_thumb(hand->thumb, &(finger_data[4]), &(finger_data[0]), frequency, flex_data);
+	PDEBUG("Finger bend: %d\n", (int)hand->thumb->bend);
+	PDEBUG("Finger curl: %d\n", (int)hand->thumb->curl);
+	PDEBUG("Finger wag: %d\n", (int)hand->thumb->wag);
+
 
     // update hand basis
     vec3 gyro_rotation_matrix[3];
@@ -50,7 +53,7 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
     for (int i = 0; i < 3; i++) hand->basis[i] = temp[i];
 }
 
-void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData finger_sensor_data[4]){
+void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData finger_sensor_data[5]){
 	// initialize hand basis
 	hand->basis[0] = (vec3) {1, 0, 0};
 	hand->basis[1] = (vec3) {0, 1, 0};
@@ -76,4 +79,6 @@ void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData fin
 		hand->finger[i] = (Finger*) malloc(sizeof(Finger));
 		initialize_finger(hand->finger[i], &(finger_sensor_data[i]));
 	}
+	hand->thumb = (Finger*) malloc(sizeof(Finger));
+//	initialize_finger(hand->thumb, &(finger_sensor_data[5]));
 }
