@@ -52,7 +52,7 @@ typedef struct
 
 /* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOTIFICATION_INTERVAL_MS 150
+#define NOTIFICATION_INTERVAL_MS 50
 /* USER CODE END PD */
 
 /* Private macros -------------------------------------------------------------*/
@@ -129,6 +129,7 @@ extern IMUData hand_sensor_data;
 extern FingerSensorData finger_sensor_data[5];
 rotation_vec3 hand_rotation_data;
 const int ACTIVE_FINGERS = 1;
+extern ADC_HandleTypeDef hadc1;
 
 const unsigned long CYCLES_PER_MS = 64000;
 unsigned long t1;
@@ -277,6 +278,12 @@ void myTask(void)
     	charValue3 = (int16_t)finger.curl;
     	charValue4 = 0;
     	charValue5 = 0;
+
+        uint16_t raw;
+        raw = HAL_ADC_GetValue(&hadc1);
+
+        float data = ((float)raw/1600)*180;
+        PDEBUG("ADC: %f \r\n", data);
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //    	PDEBUG("finger_sensor_data.x: %f\n", finger_sensor_data[0].base.accel.x);
