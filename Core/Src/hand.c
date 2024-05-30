@@ -12,9 +12,6 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
 	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
     for (int i = 0; i < 4; i++) {
         // apply finger rotation to fingers
-//    	PDEBUG("in update_hand | x:%f\n", finger_data[i].base.accel.x);
-//    	PDEBUG("in update hand | y:%f\n", finger_data[0].base.accel.y);
-//    	PDEBUG("in update hand | z:%f\n", finger_data[0].base.accel.z);
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
 		PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
 		PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
@@ -80,5 +77,4 @@ void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData fin
 		initialize_finger(hand->finger[i], &(finger_sensor_data[i]));
 	}
 	hand->thumb = (Finger*) malloc(sizeof(Finger));
-//	initialize_finger(hand->thumb, &(finger_sensor_data[5]));
 }
