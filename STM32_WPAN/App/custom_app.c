@@ -240,8 +240,8 @@ void myTask(void)
         	finger_sensor_data[i/2] = (FingerSensorData){
     			.base = (IMUData){
     				.gyro = (rotation_vec3) {
-    					.roll = data[i][0],
-    					.pitch = data[i][1],
+    					.pitch = data[i][0],
+    					.roll = data[i][1],
     					.yaw = data[i][2]
     				},
     				.accel = (vec3) {
@@ -252,8 +252,8 @@ void myTask(void)
     			},
     			.tip = (IMUData) {
     				.gyro = (rotation_vec3) {
-    					.roll = data[i+1][0],
-    					.pitch = data[i+1][1],
+    					.pitch = data[i+1][0],
+    					.roll = data[i+1][1],
     					.yaw = data[i+1][2]
     				},
     				.accel = (vec3) {
@@ -265,8 +265,8 @@ void myTask(void)
         	};
     	}
 
-    	hand_sensor_data.gyro.roll = data[10][0];
-    	hand_sensor_data.gyro.pitch = data[10][1];
+    	hand_sensor_data.gyro.pitch = data[10][0];
+    	hand_sensor_data.gyro.roll = data[10][1];
     	hand_sensor_data.gyro.yaw = data[10][2];
 
     	hand_sensor_data.accel.x = data[10][3];
