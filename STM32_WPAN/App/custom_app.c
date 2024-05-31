@@ -52,7 +52,7 @@ typedef struct
 
 /* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOTIFICATION_INTERVAL_MS 50
+#define NOTIFICATION_INTERVAL_MS 100
 /* USER CODE END PD */
 
 /* Private macros -------------------------------------------------------------*/
@@ -137,6 +137,7 @@ unsigned long t2;
 unsigned long diff;
 int frequency = 1000/(NOTIFICATION_INTERVAL_MS);
 uint8_t flag;
+uint16_t raw;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -279,10 +280,11 @@ void myTask(void)
     	charValue4 = 0;
     	charValue5 = 0;
 
-        uint16_t raw;
+    	HAL_ADC_Start(&hadc1);
+    	HAL_ADC_PollForConversion(&hadc1, 10);
         raw = HAL_ADC_GetValue(&hadc1);
 
-        float data = ((float)raw/1600)*180;
+        float data = ((float)raw/1500)*180;
         PDEBUG("ADC: %f \r\n", data);
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
