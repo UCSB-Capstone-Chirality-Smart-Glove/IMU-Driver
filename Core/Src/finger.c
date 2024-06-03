@@ -32,7 +32,7 @@ float get_fusion_bendcurl(vec3 gravity_vector, float gyro_bendcurl, float accel_
     L2_vec_norm(&gravity_vector);
     float cos = gravity_vector.x; //weight is the cos of the angle between (1 if gravity aligned with x axis, 0 if orthogonal to x-axis)
     float orthog_accel_weight = 1-cos;//sqrt(1 - cos*cos); // get the sine of the angle cos^2 = 1 - sin^2
-    PDEBUG("cos: %f\n", cos);
+//    PDEBUG("cos: %f\n", cos);
     if (0.8 < fabs(cos)){
     	orthog_accel_weight = 0;
     }
@@ -75,7 +75,7 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 	// update bend
     float bend_change = get_bend(hand_data, &(finger_data->base), frequency);
     if (bend_change < 150) finger->bend += bend_change;
-    PDEBUG("bend change: %f\n", bend_change);
+//    PDEBUG("bend change: %f\n", bend_change);
     float gyro_bend = fmod(finger->bend, 360);
 
 //    PDEBUG("mag: %f\n", magnitude(finger_data->base.accel));
@@ -83,7 +83,7 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
     // update curl
     float curl_change = get_curl(finger_data, frequency);
     if (fabs(curl_change) < 150) finger->curl += curl_change;
-    PDEBUG("curl change: %f\n", curl_change);
+//    PDEBUG("curl change: %f\n", curl_change);
     float gyro_curl = fmod(finger->curl, 360);
 
     // update wag
