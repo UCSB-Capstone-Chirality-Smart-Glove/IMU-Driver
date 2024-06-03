@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include "util.h"
 
-#define PEAK_CONST 0.01f//0.07f
+#define PEAK_CONST 0.003f//0.07f
 #define Q 0.5f
-#define g 9.9f
+#define g 9.8f
 
 // describe a finger with its basis and bend
 // basis[0] is the finger's direction and IMU's x-axis, basis[1/2] are orthonormal vectors corresponding to the IMU's y and z axes
