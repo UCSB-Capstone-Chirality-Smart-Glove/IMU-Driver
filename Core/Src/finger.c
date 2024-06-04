@@ -43,6 +43,28 @@ float get_fusion_bendcurl(vec3 gravity_vector, float gyro_bendcurl, float accel_
     return weighted_angle;//accel_weight*accel_bendcurl + gyro_weight*gyro_bendcurl;
 }
 
+float get_fusion_wag(vec3 gravity_vector, float gyro_wag, float accel_wag){
+    // perform magnitude-based weighting
+    float mag = magnitude(gravity_vector);
+    float R = (10*PEAK_CONST)/((mag-g)*(mag-g) + PEAK_CONST);
+    float mag_gyro_weight = Q/(R+Q);
+    float mag_accel_weight = R/(R+Q);
+
+    // perform orientation-based weighting
+    L2_vec_norm(&gravity_vector);
+    float sin = fabs(gravity_vector.y); //weight is the sin of the angle between (1 if gravity aligned with x axis, 0 if orthogonal to x-axis)
+    float orthog_accel_weight = 1-sin;//sqrt(1 - cos*cos); // get the sine of the angle cos^2 = 1 - sin^2
+//    PDEBUG("cos: %f\n", cos);
+    if (0.8 < fabs(sin)){
+    	orthog_accel_weight = 0;
+    }
+
+    float accel_weight = orthog_accel_weight*mag_accel_weight;
+    float gyro_weight = 1 - accel_weight;
+    float weighted_angle = gyro_weight*gyro_wag + accel_weight*accel_wag;
+    return weighted_angle;//accel_weight*accel_bendcurl + gyro_weight*gyro_bendcurl;
+}
+
 float get_bend(IMUData* hand_data, IMUData* base_data, int16_t frequency){
 	float gyro_bend = (base_data->gyro.roll - hand_data->gyro.roll)/frequency;
     return gyro_bend;
@@ -55,7 +77,7 @@ float get_curl(FingerSensorData* finger_data, int16_t frequency) {
 
 float get_wag(IMUData* hand_data, FingerSensorData* finger_data, int16_t frequency) {
 	float avg_finger_gyro_yaw = (finger_data->base.gyro.yaw + finger_data->tip.gyro.yaw)/2;
-	float gyro_wag = (avg_finger_gyro_yaw - hand_data->gyro.yaw)/frequency;
+	float gyro_wag = (finger_data->base.gyro.yaw - hand_data->gyro.yaw)/frequency;
 	return gyro_wag;
 }
 
@@ -86,16 +108,26 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 //    PDEBUG("curl change: %f\n", curl_change);
     float gyro_curl = fmod(finger->curl, 360);
 
-    // update wag
-    float wag_change = get_wag(hand_data, finger_data, frequency);
-    if (fabs(wag_change) < 150) finger->wag += wag_change;
-    finger->wag = fmod(finger->wag, 360);
 
     float accel_bend = accel_relative_rotation_from_gravity(hand_data->accel, finger_data->base.accel);
 	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
 
 	finger->bend = get_fusion_bendcurl(finger_data->base.accel, gyro_bend, accel_bend);
 	finger->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
+
+    // update wag
+	if (finger->bend < 45) {
+	    float wag_change = get_wag(hand_data, finger_data, frequency);
+	    float pitch_change = (finger_data->base.gyro.pitch + hand_data->gyro.pitch)/2;
+	    if (fabs(pitch_change) < fabs(wag_change)*4) finger->wag += wag_change;
+	    float gyro_wag = fmod(finger->wag, 360);
+		float accel_wag = accel_bend; // calculated the same for the accelerometers
+		finger->wag = get_fusion_wag(hand_data->accel, gyro_wag, accel_wag);
+
+	}
+	else // can't wag with a clenched fist
+		finger->wag = 0;
+
 }
 
 void calibrate_thumb(Finger* thumb) {
@@ -107,7 +139,7 @@ void update_thumb(Finger* thumb, FingerSensorData* finger_data, FingerSensorData
 
 	// update bend (using palm flex sensor)
 	float palm_flex_bend = flex_data[0];
-	thumb->bend = palm_flex_bend;
+	thumb->bend = 180 - palm_flex_bend;
 
 	// update curl (with IMUs)
 	float gyro_curl_change = get_curl(finger_data, frequency);
@@ -117,11 +149,12 @@ void update_thumb(Finger* thumb, FingerSensorData* finger_data, FingerSensorData
 	thumb->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
 
 	// update wag angle (with index imu data and maybe flex sensor)
-	float web_flex_wag = flex_data[1];
 	float avg_index_gyro_yaw = (index_data->base.gyro.yaw + index_data->tip.gyro.yaw)/2;
 	float avg_thumb_gyro_yaw = (finger_data->base.gyro.yaw + finger_data->tip.gyro.yaw)/2;
-	float gyro_wag = avg_thumb_gyro_yaw - avg_index_gyro_yaw;
+	float gyro_wag = (avg_thumb_gyro_yaw - avg_index_gyro_yaw)/frequency;
 	thumb->wag += gyro_wag;
+//    float accel_wag = accel_relative_rotation_from_gravity(hand_data->accel, finger_data->base.accel);
+
 }
 
 void initialize_finger(Finger *finger,

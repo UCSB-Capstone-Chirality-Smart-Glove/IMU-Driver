@@ -286,6 +286,7 @@ void myTask(void)
 
         float data = ((float)raw/1500)*180;
         PDEBUG("ADC: %f \r\n", data);
+        flexData[0] = data;
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //    	PDEBUG("finger_sensor_data.x: %f\n", finger_sensor_data[0].base.accel.x);

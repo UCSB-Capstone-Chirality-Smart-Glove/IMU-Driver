@@ -7,9 +7,9 @@ void calibrate_hand_basis(Hand* hand) {
 }
 
 void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSensorData finger_data[5], float flex_data[]) {
-	PDEBUG("hand Roll: %d\n", (int)hand_rotation->gyro.roll);
-	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->gyro.pitch);
-	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
+//	PDEBUG("hand Roll: %d\n", (int)hand_rotation->gyro.roll);
+//	PDEBUG("hand Pitch: %d\n", (int)hand_rotation->gyro.pitch);
+//	PDEBUG("hand Yaw: %d\n", (int)hand_rotation->gyro.yaw);
     for (int i = 0; i < 4; i++) {
         // apply finger rotation to fingers
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
@@ -19,9 +19,9 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
     }
     // TODO: update thumb
     update_thumb(hand->thumb, &(finger_data[4]), &(finger_data[0]), frequency, flex_data);
-	PDEBUG("Finger bend: %d\n", (int)hand->thumb->bend);
-	PDEBUG("Finger curl: %d\n", (int)hand->thumb->curl);
-	PDEBUG("Finger wag: %d\n", (int)hand->thumb->wag);
+	PDEBUG("Thumb bend: %d\n", (int)hand->thumb->bend);
+	PDEBUG("Thumb curl: %d\n", (int)hand->thumb->curl);
+	PDEBUG("Thumb wag: %d\n", (int)hand->thumb->wag);
 
 
     // update hand basis
@@ -77,4 +77,5 @@ void initialize_hand(Hand* hand, IMUData* hand_sensor_data, FingerSensorData fin
 		initialize_finger(hand->finger[i], &(finger_sensor_data[i]));
 	}
 	hand->thumb = (Finger*) malloc(sizeof(Finger));
+	hand->thumb->wag = 0;
 }
