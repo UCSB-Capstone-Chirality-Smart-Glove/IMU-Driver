@@ -64,7 +64,7 @@ typedef struct{
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-uint8_t SizeF1 = 14;
+uint8_t SizeF1 = 15;
 uint8_t SizeF2 = 12;
 
 /**

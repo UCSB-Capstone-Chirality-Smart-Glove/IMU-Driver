@@ -76,8 +76,8 @@ uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
-uint8_t fingerPacket[14];
-uint8_t handPacket[13];
+uint8_t fingerPacket[15];
+uint8_t handPacket[12];
 uint8_t UpdateCharData2[12]; //Put Second Char data here, Put first finger packet info in UpdateCharData[]
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
