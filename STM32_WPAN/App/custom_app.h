@@ -74,7 +74,7 @@ void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1
                           uint8_t finger3Bend, uint16_t finger4Curl, uint8_t finger4Bend,
                           uint16_t thumbCurl, uint8_t thumbBend);
 void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX, uint16_t basisVectorY, uint16_t basisVectorZ,
-		uint8_t flexSensorPalm, uint8_t wag1, uint8_t wag2, uint8_t wag3, uint8_t wag4, uint8_t wag5, uint8_t moreData);
+		uint8_t flexSensorPalm, int8_t wag1, int8_t wag2, int8_t wag3, int8_t wag4, int8_t wag5, uint8_t moreData);
 /* USER CODE END EF */
 
 #ifdef __cplusplus

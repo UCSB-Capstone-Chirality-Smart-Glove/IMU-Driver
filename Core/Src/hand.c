@@ -13,14 +13,14 @@ void update_hand(Hand* hand, IMUData* hand_rotation, int16_t frequency, FingerSe
     for (int i = 0; i < 4; i++) {
         // apply finger rotation to fingers
         update_finger(hand->finger[i], &(finger_data[i]), frequency, hand_rotation);
-		PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
-		PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
+//		PDEBUG("Finger %d bend: %d\n", i, (int)hand->finger[i]->bend);
+//		PDEBUG("Finger %d curl: %d\n", i, (int)hand->finger[i]->curl);
 		PDEBUG("Finger %d wag: %d\n", i, (int)hand->finger[i]->wag);
     }
     // TODO: update thumb
     update_thumb(hand->thumb, &(finger_data[4]), &(finger_data[0]), frequency, flex_data);
-	PDEBUG("Thumb bend: %d\n", (int)hand->thumb->bend);
-	PDEBUG("Thumb curl: %d\n", (int)hand->thumb->curl);
+//	PDEBUG("Thumb bend: %d\n", (int)hand->thumb->bend);
+//	PDEBUG("Thumb curl: %d\n", (int)hand->thumb->curl);
 	PDEBUG("Thumb wag: %d\n", (int)hand->thumb->wag);
 
 

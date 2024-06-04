@@ -76,8 +76,8 @@ uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
-uint8_t fingerPacket[14];
-uint8_t handPacket[13];
+uint8_t fingerPacket[15];
+uint8_t handPacket[12];
 uint8_t UpdateCharData2[12]; //Put Second Char data here, Put first finger packet info in UpdateCharData[]
 uint8_t UpdateCharData3[4];
 uint8_t UpdateCharData4[4];
@@ -298,16 +298,19 @@ void myTask(void)
     	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
     	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
+    	int big_precision = 16;
+    	int medium_precision = 4;
+    	int small_precision = 2;
     	populateFingerPacket(fingerPacket,
-    			hand.finger[0]->curl, hand.finger[0]->bend,
-				hand.finger[1]->curl, hand.finger[1]->bend,
-				hand.finger[2]->curl, hand.finger[2]->bend,
-				hand.finger[3]->curl, hand.finger[3]->bend,
-				hand.finger[4]->curl, hand.finger[4]->bend);
+    			hand.finger[0]->curl * big_precision, hand.finger[0]->bend * small_precision,
+				hand.finger[1]->curl * big_precision, hand.finger[1]->bend * small_precision,
+				hand.finger[2]->curl * big_precision, hand.finger[2]->bend * small_precision,
+				hand.finger[3]->curl * big_precision, hand.finger[3]->bend * small_precision,
+				hand.thumb->curl * big_precision, hand.thumb->bend * small_precision);
     	populateHandPacket(handPacket, 0, 0, 0, 0,
-    			hand.finger[0]->wag, hand.finger[1]->wag,
-				hand.finger[2]->wag, hand.finger[3]->wag,
-				hand.finger[4]->wag, 0);
+    			hand.finger[0]->wag * medium_precision, hand.finger[1]->wag * medium_precision,
+				hand.finger[2]->wag * medium_precision, hand.finger[3]->wag * medium_precision,
+				hand.thumb->wag * medium_precision, 0);
 
         if (UpdateCharData[0] == 180) {
             UpdateCharData[0] = 0;
@@ -389,8 +392,8 @@ void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1
 
 void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX,
 						uint16_t basisVectorY, uint16_t basisVectorZ, uint8_t flexSensorPalm,
-						uint8_t wag1, uint8_t wag2, uint8_t wag3,
-						uint8_t wag4, uint8_t wag5, uint8_t moreData) {
+						int8_t wag1, int8_t wag2, int8_t wag3,
+						int8_t wag4, int8_t wag5, uint8_t moreData) {
 	buffer[0] = (basisVectorX >> 8) & 0xFF;
 	buffer[1] = basisVectorX & 0xFF;
 	buffer[2] = (basisVectorY >> 8) & 0xFF;
@@ -398,11 +401,11 @@ void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX,
 	buffer[4] = (basisVectorZ >> 8) & 0xFF;
 	buffer[5] = basisVectorZ & 0xFF;
 	buffer[6] = flexSensorPalm;
-	buffer[7] = wag1;
-	buffer[8] = wag2;
-	buffer[9] = wag3;
-	buffer[10] = wag4;
-	buffer[11] = wag5;
+	buffer[8] = wag1;
+	buffer[9] = wag2;
+	buffer[10] = wag3;
+	buffer[11] = wag4;
+	buffer[7] = wag5;
 }
 
 /* USER CODE END PFP */
