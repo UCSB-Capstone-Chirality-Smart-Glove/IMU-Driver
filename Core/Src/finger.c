@@ -122,7 +122,7 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 	if (finger->bend < 30) {
 	    float wag_change = get_wag(hand_data, finger_data, frequency);
 	    float pitch_change = (finger_data->base.gyro.pitch + hand_data->gyro.pitch)/2;
-	    if (fabs(pitch_change) < fabs(wag_change)*4) finger->wag += wag_change;
+	    if (fabs(pitch_change) < fabs(wag_change)*4) finger->wag += wag_change;//fusion_wag = finger->wag + wag_change;
 	    float gyro_wag = fmod(finger->wag, 360);
 //		float accel_wag = accel_bend + 10; // calculated the same for the accelerometers
 //		fusion_wag = get_fusion_wag(hand_data->accel, gyro_wag, accel_wag);
@@ -133,10 +133,9 @@ void update_finger(Finger* finger, FingerSensorData* finger_data, int16_t freque
 		else if (fusion_wag > wag_bound) fusion_wag = wag_bound;
 	}
 	else // can't wag with a clenched fist
-		fusion_wag = 0;
-	finger->wag /= 2;
-	finger->wag += fusion_wag / 2;
-
+		finger->wag /= 2;
+//	finger->wag /= 2;
+//	finger->wag += fusion_wag / 2;
 
 }
 
@@ -149,14 +148,17 @@ void update_thumb(Finger* thumb, FingerSensorData* finger_data, FingerSensorData
 
 	// update bend (using palm flex sensor)
 	float palm_flex_bend = flex_data[0];
-	thumb->bend = 180 - palm_flex_bend;
+	int palm_bias = 15;
+	float palm_bend = 180 - palm_flex_bend - palm_bias;
+	thumb->bend = thumb->bend/2 + palm_bend/2;
 
 	// update curl (with IMUs)
 	float gyro_curl_change = get_curl(finger_data, frequency);
     if (fabs(gyro_curl_change) < 150) thumb->curl += gyro_curl_change;
     float gyro_curl = fmod(thumb->curl, 360);
 	float accel_curl = accel_relative_rotation_from_gravity(finger_data->base.accel, finger_data->tip.accel);
-	thumb->curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
+	float fusion_curl = get_fusion_bendcurl(finger_data->base.accel, gyro_curl, accel_curl);
+	thumb->curl = thumb->curl/2 + fusion_curl/2;
 
 	// update wag angle (with index imu data and maybe flex sensor)
 	float avg_index_gyro_yaw = (index_data->base.gyro.yaw + index_data->tip.gyro.yaw)/2;

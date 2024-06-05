@@ -52,7 +52,8 @@ typedef struct
 
 /* Private defines ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NOTIFICATION_INTERVAL_MS 100
+#define NOTIFICATION_INTERVAL_MS 25
+
 /* USER CODE END PD */
 
 /* Private macros -------------------------------------------------------------*/
@@ -76,7 +77,7 @@ uint8_t NotifyCharData[247];
 
 /* USER CODE BEGIN PV */
 static uint32_t lastNotificationTime = 0;
-uint8_t fingerPacket[15];
+uint8_t fingerPacket[16];
 uint8_t handPacket[12];
 uint8_t UpdateCharData2[12]; //Put Second Char data here, Put first finger packet info in UpdateCharData[]
 uint8_t UpdateCharData3[4];
@@ -285,18 +286,16 @@ void myTask(void)
         raw = HAL_ADC_GetValue(&hadc1);
 
         float data = ((float)raw/1500)*180;
-        PDEBUG("ADC: %f \r\n", data);
+//        PDEBUG("ADC: %f \r\n", data);
         flexData[0] = data;
 
 //    	update_finger(&finger, &finger_sensor_data, frequency, hand_rotation_data);
 //    	PDEBUG("finger_sensor_data.x: %f\n", finger_sensor_data[0].base.accel.x);
     	update_hand(&hand, &hand_sensor_data, frequency, finger_sensor_data, flexData);
     	hand_rotation_data = matrix_to_euler(hand.basis);
-    	PDEBUG("Bend: %d\n", (int)hand.finger[0]->bend);
-    	PDEBUG("Curl: %d\n", (int)hand.finger[0]->curl);
-    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
-    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
-    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
+//    	PDEBUG("Roll: %d\n", (int)hand_rotation_data.roll);
+//    	PDEBUG("Pitch: %d\n", (int)hand_rotation_data.pitch);
+//    	PDEBUG("Yaw: %d\n", (int)hand_rotation_data.yaw);
 
     	int big_precision = 16;
     	int medium_precision = 4;
@@ -306,8 +305,8 @@ void myTask(void)
 				hand.finger[1]->curl * big_precision, hand.finger[1]->bend * small_precision,
 				hand.finger[2]->curl * big_precision, hand.finger[2]->bend * small_precision,
 				hand.finger[3]->curl * big_precision, hand.finger[3]->bend * small_precision,
-				hand.thumb->curl * big_precision, hand.thumb->bend * small_precision);
-    	populateHandPacket(handPacket, 0, 0, 0, 0,
+				hand.thumb->curl * big_precision, hand.thumb->bend);
+    	populateHandPacket(handPacket, 0, 0, 0, hand.thumb->bend,
     			hand.finger[0]->wag * medium_precision, hand.finger[1]->wag * medium_precision,
 				hand.finger[2]->wag * medium_precision, hand.finger[3]->wag * medium_precision,
 				hand.thumb->wag * medium_precision, 0);
@@ -388,6 +387,9 @@ void populateFingerPacket(uint8_t *buffer, uint16_t finger1Curl, uint8_t finger1
     buffer[12] = (thumbCurl >> 8) & 0xFF;
     buffer[13] = thumbCurl & 0xFF;
     buffer[14] = thumbBend;
+    buffer[15] = thumbBend;
+    buffer[16] = thumbBend;
+
 }
 
 void populateHandPacket(uint8_t *buffer, uint16_t basisVectorX,

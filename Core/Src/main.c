@@ -214,6 +214,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	PDEBUG("Ready!\n");
     MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
